@@ -1,0 +1,113 @@
+.dashboard-wrapper {
+  background-color: #f8fbff;
+  min-height: 100vh;
+}
+
+.dashboard-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #1a1a1a;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.card-header {
+  padding: 15px 25px;
+  border-bottom: 1px solid #e0e6ed;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Item Rows */
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.item-info {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.item-thumb {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.btn-return {
+  background-color: #2eb8ac;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Table Styles */
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transaction-table th {
+  background-color: #f4f7f9;
+  text-align: left;
+  padding: 15px 25px;
+  color: #666;
+  font-size: 14px;
+}
+
+.transaction-table td {
+  padding: 15px 25px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.status-badge.completed {
+  background-color: #2eb8ac;
+  color: white;
+  padding: 6px 15px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+}
+
+.pagination button {
+  padding: 8px 14px;
+  border: 1px solid #dfe3e8;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #5a67d8;
+  color: white;
+  border-color: #5a67d8;
+}

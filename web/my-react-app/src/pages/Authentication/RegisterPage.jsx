@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../css/auth.css"; // Only using ONE css file now!
-import authImgs from "../assets/background.jpg"
-import logo from "../assets/logo.png"
+import "./auth.css"; // Dedicated CSS for the login page
+import authImgs from "../../assets/Background.jpg"
+import logo from "../../assets/Logo.png"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
