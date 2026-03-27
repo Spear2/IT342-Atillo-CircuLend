@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getToken } from "../security/auth";
-import "../css/landing.css";
+import { getToken } from "../../security/auth";
+import "./landing.css";
 
 const LandingPage = () => {
   const isLoggedIn = getToken();

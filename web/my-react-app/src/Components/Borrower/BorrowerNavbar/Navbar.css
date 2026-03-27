@@ -1,0 +1,163 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+  background-color: white;
+  border-bottom: 1px solid #eef2f6;
+  height: 70px;
+}
+
+.navbar-left, .navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #8e67ab; /* Matching that purple/pinkish hue */
+}
+
+/* Search Bar */
+.search-container {
+  position: relative;
+  width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px 10px 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #f3f6f9;
+  font-size: 14px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+/* Navigation Links */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.nav-links a.active {
+  color: #1a1a1a;
+  border-bottom: 2px solid #5a67d8;
+  padding-bottom: 24px;
+}
+
+/* User Section */
+.user-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-dropdown {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.icon-group {
+  display: flex;
+  background-color: #7c3aed; /* The purple background in the image */
+  padding: 4px;
+  border-radius: 8px;
+  gap: 4px;
+}
+
+.nav-icon-btn {
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: transparent;
+}
+
+.nav-icon-btn.avatar-bg {
+  background-color: #5a67d8;
+}
+
+/* Container to keep the menu aligned to the button */
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px); /* Appear just below the button */
+  right: 0;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f8fafc;
+}
+
+.dropdown-item.logout {
+  color: #e53e3e; /* Red color for logout */
+  font-weight: 500;
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.arrow.up {
+  transform: rotate(180deg);
+}

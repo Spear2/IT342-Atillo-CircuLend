@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../css/auth.css"; // Dedicated CSS for the login page
-import authImg from "../assets/background.jpg"
-import logo from "../assets/logo.png"
-import { setToken, setRole } from "../security/auth"
+import "./auth.css"; // Dedicated CSS for the login page
+import authImg from '../../assets/Background.jpg'
+import logo from '../../assets/Logo.png'
+import { setToken, setRole } from "../../security/auth"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -46,7 +46,7 @@ const LoginPage = () => {
 
     const data = await response.json();
     
-    console.log("SERVER RESPONSE:", data); 
+   
 
     if (!response.ok) {
       alert(data.error?.message || "Invalid email or password.");

@@ -1,9 +1,9 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { getToken } from "./security/auth";
-import LandingPage from "./pages/LandingPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import Dashboard from "./pages/Dashboard";
+import LandingPage from "./pages/Landing/LandingPage";
+import LoginPage from "./pages/Authentication/LoginPage";
+import RegisterPage from "./pages/Authentication/RegisterPage";
+import BorrowerDashboard from "./DashboardRoutes";
 
 function ProtectedRoute({ children }) {
   if (!getToken()) return <Navigate to="/login" replace />;
@@ -20,7 +20,7 @@ function WebRoutes() {
         path="/dashboard/*"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <BorrowerDashboard />
           </ProtectedRoute>
         }
       />
