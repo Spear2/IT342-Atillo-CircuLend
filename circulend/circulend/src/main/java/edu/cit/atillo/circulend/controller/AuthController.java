@@ -41,7 +41,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<LoginDataDTO>> register(@RequestBody RegisterDTO dto) {
         User user = authService.registration(dto);
-        String token = tokenProvider.createToken(user.getUserId(), user.getRole());
+        String token = tokenProvider.createToken(user.getUserId(), user.getRole().name());
         LoginDataDTO data = new LoginDataDTO(UserResponseDTO.fromUser(user), token, null);
         return ResponseEntity.ok(ApiResponse.success(data));
     }

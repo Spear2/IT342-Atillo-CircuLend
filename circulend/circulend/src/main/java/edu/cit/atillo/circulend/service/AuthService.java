@@ -2,6 +2,8 @@ package edu.cit.atillo.circulend.service;
 
 import edu.cit.atillo.circulend.dto.*;
 import edu.cit.atillo.circulend.entity.User;
+import edu.cit.atillo.circulend.entity.enums.AuthProvider;
+import edu.cit.atillo.circulend.entity.enums.Role;
 import edu.cit.atillo.circulend.repository.UserRepository;
 import edu.cit.atillo.circulend.security.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ public class AuthService {
         if(!passwordEncoder.matches(dto.getPassword(), user.getPassword())){
             throw new RuntimeException("Invalid Password!");
         }
-        String token = tokenProvider.createToken(user.getUserId(), user.getRole());
+        String token = tokenProvider.createToken(user.getUserId(), user.getRole().name());
         return new LoginDataDTO(UserResponseDTO.fromUser(user), token, null);
     }
 
@@ -42,8 +44,8 @@ public class AuthService {
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole("BORROWER");
-        user.setAuthProvider("LOCAL");
+        user.setRole(Role.BORROWER);
+        user.setAuthProvider(AuthProvider.LOCAL);
 
         return userRepo.save(user);
     }
