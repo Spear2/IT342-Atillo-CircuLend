@@ -38,7 +38,7 @@ public class UserResponseDTO {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setEmail(user.getEmail());
-        dto.setRole(user.getRole());
+        dto.setRole(user.getRole().name());
         dto.setCreatedAt(user.getCreatedAt());
         return dto;
     }
