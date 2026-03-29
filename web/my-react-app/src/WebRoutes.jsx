@@ -1,12 +1,16 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { getToken } from "./security/auth";
+import { getToken, getRole } from "./security/auth";
 import LandingPage from "./pages/Landing/LandingPage";
 import LoginPage from "./pages/Authentication/LoginPage";
 import RegisterPage from "./pages/Authentication/RegisterPage";
-import BorrowerDashboard from "./DashboardRoutes";
+import BorrowerDashboard from "./BorrowerDashboardRoutes";
+import AdminDashboard from "./AdminDashboardRoutes"
 
-function ProtectedRoute({ children }) {
-  if (!getToken()) return <Navigate to="/login" replace />;
+function RoleProtectedRoute({ allowedRoles, children }) {
+  const token = getToken();
+  const role = (getRole() || "").toUpperCase();
+  if (!token) return <Navigate to="/login" replace />;
+  if (!allowedRoles.includes(role)) return <Navigate to="/unauthorized" replace />;
   return children;
 }
 
@@ -16,15 +20,25 @@ function WebRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+
+
       <Route
-        path="/dashboard/*"
+        path="/borrower/*"
         element={
-          <ProtectedRoute>
+          <RoleProtectedRoute allowedRoles={["BORROWER"]}>
             <BorrowerDashboard />
-          </ProtectedRoute>
+          </RoleProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      
+      <Route 
+        path="/admin/*" 
+        element={
+          <RoleProtectedRoute allowedRoles={["ADMIN"]}>
+            <AdminDashboard/>
+          </RoleProtectedRoute>
+        }/>
     </Routes>
   );
 }

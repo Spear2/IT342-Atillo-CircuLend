@@ -1,0 +1,38 @@
+.admin-sidebar {
+  width: 240px;
+  background: #2d3748; /* Dark color from image */
+  color: white;
+  height: 100vh;
+  padding-top: 20px;
+}
+
+.sidebar-header {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #a0aec0;
+  text-transform: uppercase;
+}
+
+.sidebar-menu {
+  margin-top: 15px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  color: #cbd5e0;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.menu-item:hover {
+  background: #4a5568;
+}
+
+.menu-item.active {
+  background: #319795; /* Teal active color from image */
+  color: white;
+}

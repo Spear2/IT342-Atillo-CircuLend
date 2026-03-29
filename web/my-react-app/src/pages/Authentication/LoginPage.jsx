@@ -4,6 +4,7 @@ import "./auth.css"; // Dedicated CSS for the login page
 import authImg from '../../assets/Background.jpg'
 import logo from '../../assets/Logo.png'
 import { setToken, setRole } from "../../security/auth"
+import Footer from "../../Components/Shared/Footer/Footer"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -66,9 +67,9 @@ const LoginPage = () => {
     alert("Login successful!");
 
     if (role.toUpperCase() === "ADMIN") {
-      navigate("/dashboard", { replace: true });
+      navigate("/admin", { replace: true });
     } else {
-      navigate("/dashboard", { replace: true });
+      navigate("/borrower", { replace: true });
     }
 
   } catch (err) {
@@ -174,6 +175,8 @@ const LoginPage = () => {
           </form>
         </div>
       </div>
+
+      <Footer/>
     </div>
   );
 };
