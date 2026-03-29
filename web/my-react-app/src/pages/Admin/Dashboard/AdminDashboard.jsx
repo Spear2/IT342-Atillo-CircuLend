@@ -1,0 +1,34 @@
+import React from 'react';
+import AdminNavbar from '../../../Components/Admin/Navbar/Navbar';
+import AdminSidebar from '../../../Components/Admin/Sidebar/Sidebar';
+import Footer from '../../../Components/Shared/Footer/Footer'
+import InventoryManagement from '../../../Components/Admin/InventoryTable/InventoryManagement';
+import GlobalTransactions from '../../../Components/Admin/TransactionTable/GlobalTransactions';
+import UserManagementTable from '../../../Components/Admin/UserManagementTable/UserManagementTable';
+import './adminDashboard.css';
+
+const AdminDashboard = () => {
+  return (
+    <div className="admin-layout">
+      <AdminSidebar />
+      <div className="admin-main-content">
+        <AdminNavbar />
+        
+        <div className="admin-container">
+          <header className="admin-header">
+            <h1>Admin Overview</h1>
+            <button className="btn-add-item">+ Add New Item</button>
+          </header>
+
+          {/* You can now easily toggle these or put them on separate routes */}
+          <InventoryManagement />
+          <GlobalTransactions />
+          <UserManagementTable />
+        </div>
+      </div>
+      
+    </div>
+  );
+};
+
+export default AdminDashboard;

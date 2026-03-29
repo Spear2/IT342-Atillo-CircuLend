@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./auth.css"; // Dedicated CSS for the login page
 import authImgs from "../../assets/Background.jpg"
 import logo from "../../assets/Logo.png"
+import Footer from "../../Components/Shared/Footer/Footer"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -225,6 +226,7 @@ const RegisterPage = () => {
           </form>
         </div>
       </div>
+      
     </div>
   );
 };

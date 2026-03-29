@@ -1,0 +1,73 @@
+.admin-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 30px;
+  background: white;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.logo-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #805ad5;
+}
+
+.search-bar {
+  position: relative;
+}
+
+.search-bar input {
+  padding: 10px 15px 10px 35px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 300px;
+}
+
+.admin-dropdown-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-icon-group {
+  display: flex;
+  background: #5a67d8;
+  padding: 5px;
+  border-radius: 10px;
+  gap: 5px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.icon-btn.avatar {
+  background: #4c51bf;
+  border-radius: 6px;
+}
+
+.admin-menu {
+  position: absolute;
+  top: 50px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.logout-btn
