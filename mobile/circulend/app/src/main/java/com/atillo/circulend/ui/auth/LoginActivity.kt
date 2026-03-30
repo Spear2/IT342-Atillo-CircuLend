@@ -13,6 +13,7 @@ import com.atillo.circulend.data.model.request.LoginRequest
 import com.atillo.circulend.data.model.response.ApiResponse
 import com.atillo.circulend.data.model.response.LoginData
 import com.atillo.circulend.data.remote.RetrofitClient
+import com.atillo.circulend.ui.Dashboard.Dashboard
 import com.atillo.circulend.util.SessionManager
 import retrofit2.Call
 import retrofit2.Callback
@@ -82,8 +83,8 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this@LoginActivity, "Login successful", Toast.LENGTH_SHORT).show()
 
                     // Replace with your next activity
-                    // startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
-                    // finish()
+                     startActivity(Intent(this@LoginActivity, Dashboard::class.java))
+                     finish()
                 } else {
                     val msg = body?.error?.message ?: "Invalid email or password."
                     Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_LONG).show()
