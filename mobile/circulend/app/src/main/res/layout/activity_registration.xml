@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/Background" />
+                android:src="@drawable/background" />
         </RelativeLayout>
 
 
@@ -49,7 +49,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_marginEnd="12dp"
-                    android:src="@drawable/Logo" />
+                    android:src="@drawable/logo" />
 
                 <TextView
                     android:id="@+id/screenTitle"
