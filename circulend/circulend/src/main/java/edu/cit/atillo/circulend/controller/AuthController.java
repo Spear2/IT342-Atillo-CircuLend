@@ -27,23 +27,10 @@ public class AuthController {
         this.tokenProvider = tokenProvider;
     }
 
-//    @PostMapping("/register")
-//    public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterDTO dto) {
-//        User user = authService.registration(dto);
-//        return ResponseEntity.ok(UserResponseDTO.fromUser(user));
-//    }
-//
-//    @PostMapping("/login")
-//    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
-//        return ResponseEntity.ok(authService.login(dto));
-//    }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<LoginDataDTO>> register(@RequestBody RegisterDTO dto) {
-        User user = authService.registration(dto);
-        String token = tokenProvider.createToken(user.getUserId(), user.getRole().name());
-        LoginDataDTO data = new LoginDataDTO(UserResponseDTO.fromUser(user), token, null);
-        return ResponseEntity.ok(ApiResponse.success(data));
+    public ResponseEntity<ApiResponse<UserResponseDTO>> register(@RequestBody RegisterDTO dto) {
+        return ResponseEntity.ok(ApiResponse.success(authService.registration(dto)));
     }
 
     @PostMapping("/login")
@@ -51,4 +38,11 @@ public class AuthController {
         LoginDataDTO data = authService.login(dto);
         return ResponseEntity.ok(ApiResponse.success(data));
     }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+        return ResponseEntity.ok(authService.verifyEmail(token));
+    }
+
+
 }

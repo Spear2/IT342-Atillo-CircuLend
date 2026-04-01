@@ -10,7 +10,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        indexes = {
+                @Index(name = "idx_users_email", columnList = "email"),
+                @Index(name = "idx_users_google_sub", columnList = "google_sub"),
+                @Index(name = "idx_users_verification_token_hash", columnList = "verification_token_hash")
+        }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,9 +37,9 @@ public class User {
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
-    // Nullable for GOOGLE-auth users
+    // Null for GOOGLE accounts; required for LOCAL accounts (enforced in service)
     @JsonIgnore
-    @Column(name = "password_hash", nullable = true)
+    @Column(name = "password_hash")
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +49,24 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false, length = 20)
     private AuthProvider authProvider;
+
+    // Google "sub" claim, stable per account
+    @Column(name = "google_sub", unique = true, length = 255)
+    private String googleSub;
+
+    // Email verification fields (for LOCAL auth)
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
+    @JsonIgnore
+    @Column(name = "verification_token_hash", length = 255)
+    private String verificationTokenHash;
+
+    @Column(name = "verification_token_expires_at")
+    private LocalDateTime verificationTokenExpiresAt;
+
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

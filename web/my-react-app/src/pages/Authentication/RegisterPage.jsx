@@ -62,7 +62,7 @@ const RegisterPage = () => {
       }
       
       const data = await response.json();
-      alert("User registration successful!"); 
+      alert("Registration successful! Please check your email to verify your account.");
       navigate("/login"); 
     }
     catch(err) {
