@@ -5,6 +5,7 @@ import LoginPage from "./pages/Authentication/LoginPage";
 import RegisterPage from "./pages/Authentication/RegisterPage";
 import BorrowerDashboard from "./BorrowerDashboardRoutes";
 import AdminDashboard from "./AdminDashboardRoutes"
+import VerifyEmailPage from "./pages/EmailVerification/EmailVerificationPage";
 
 function RoleProtectedRoute({ allowedRoles, children }) {
   const token = getToken();
@@ -20,6 +21,7 @@ function WebRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage/>}/>
       <Route path="*" element={<Navigate to="/login" replace />} />
 
 
