@@ -4,6 +4,7 @@ import "./auth.css"; // Dedicated CSS for the login page
 import authImgs from "../../assets/Background.jpg"
 import logo from "../../assets/Logo.png"
 import Footer from "../../Components/Shared/Footer/Footer"
+import { apiFetch } from "../../Utils/apiFetch";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -34,41 +35,48 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null); 
+    setError(null);
 
-    if (!form.firstName.trim()) return "First name is required.";
-    if (!form.lastName.trim()) return "Last name is required.";
-    
+    if (!form.firstName.trim()) {
+      setError("First name is required.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!form.lastName.trim()) {
+      setError("Last name is required.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email)) return "Please enter a valid email address.";
+    if (!emailRegex.test(form.email)) {
+      setError("Please enter a valid email address.");
+      setIsSubmitting(false);
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match.");
       setIsSubmitting(false);
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE}/api/auth/register`, {
+      await apiFetch(`${API_BASE}/api/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
       });
 
-      if (!response.ok) {
-        const err = await response.json();
-        alert(err.message || "User registration failed!");
-        return;
-      }
-      
-      const data = await response.json();
-      alert("Registration successful! Please check your email to verify your account.");
-      navigate("/login"); 
-    }
-    catch(err) {
-      setError(err.message || "Unable to register right now.");
-    }
-    finally {
+      alert("Registration successful! Check your email to verify your account.");
+      navigate("/login");
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsSubmitting(false);
     }
   };

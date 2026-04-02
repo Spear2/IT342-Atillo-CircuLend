@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { apiFetch } from "../../Utils/apiFetch";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -15,22 +16,23 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     if (!token) return;
 
-    fetch(`${API_BASE}/api/auth/verify-email?token=${token}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setStatus("success");
-          setMessage(data.message || "Email verified successfully.");
-        } else {
-          setStatus("error");
-          setMessage(data.message || "Verification failed.");
-        }
-      })
-      .catch(() => {
+    async function verify() {
+        try {
+        const body = await apiFetch(
+            `${API_BASE}/api/auth/verify-email?token=${token}`
+        );
+
+        setStatus("success");
+        setMessage(body.data || "Email verified successfully.");
+
+        } catch (err) {
         setStatus("error");
-        setMessage("Could not connect to the server.");
-      });
-  }, [token]);
+        setMessage(err.message);
+        }
+    }
+
+    verify();
+    }, [token]);
 
   return (
     <div style={{ textAlign: "center", marginTop: "100px" }}>
