@@ -1,5 +1,6 @@
 package edu.cit.atillo.circulend.entity;
 
+import edu.cit.atillo.circulend.entity.enums.AuditActionType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +20,11 @@ public class AuditLog {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user; // nullable if system action
+    private User user; // nullable for system-level events
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "action_type", nullable = false, length = 80)
-    private String actionType;
+    private AuditActionType actionType;
 
     @Column(nullable = false, length = 1000)
     private String description;
@@ -32,6 +34,8 @@ public class AuditLog {
 
     @PrePersist
     protected void onCreate() {
-        if (timestamp == null) timestamp = LocalDateTime.now();
+        if (timestamp == null) {
+            timestamp = LocalDateTime.now();
+        }
     }
 }

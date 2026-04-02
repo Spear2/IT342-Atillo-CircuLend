@@ -48,7 +48,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (Exception e) {
-            // invalid or expired token; leave context empty so 403/401 is returned
+            SecurityContextHolder.clearContext();
+            request.setAttribute("auth_error_message", "Invalid or expired token");
         }
         filterChain.doFilter(request, response);
     }
