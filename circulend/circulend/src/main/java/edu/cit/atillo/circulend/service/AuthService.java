@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -77,13 +78,21 @@ public class AuthService {
         return UserResponseDTO.fromUser(saved);
     }
 
-    public ApiResponse<?> verifyEmail(String rawToken) {
+    public ApiResponse<String> verifyEmail(String rawToken) {
         String hashed = tokenHashUtil.sha256(rawToken);
         User user = userRepo.findByVerificationTokenHash(hashed)
-                .orElseThrow(() -> new RuntimeException("Invalid verification token"));
+                .orElseThrow(() -> new AuthException(
+                        "AUTH-006",
+                        "Invalid or expired verification token",
+                        HttpStatus.BAD_REQUEST
+                ));
         if (user.getVerificationTokenExpiresAt() == null ||
                 user.getVerificationTokenExpiresAt().isBefore(LocalDateTime.now())) {
-            return ApiResponse.failure("AUTH-006", "Verification token expired", null);
+            throw new AuthException(
+                    "AUTH-006",
+                    "Verification token expired",
+                    HttpStatus.BAD_REQUEST
+            );
         }
         user.setEmailVerified(true);
         user.setVerifiedAt(LocalDateTime.now());
@@ -91,6 +100,40 @@ public class AuthService {
         user.setVerificationTokenExpiresAt(null);
         userRepo.save(user);
         return ApiResponse.success("Email verified successfully.");
+    }
+
+
+    public ApiResponse<String> resendVerification(ResendVerificationRequestDTO dto) {
+        // Generic response to avoid email enumeration
+        String generic = "If this email is registered and unverified, a verification email was sent.";
+
+        Optional<User> userOpt = userRepo.findByEmail(dto.getEmail());
+        if (userOpt.isEmpty()) {
+            return ApiResponse.success(generic);
+        }
+
+        User user = userOpt.get();
+
+        // Only LOCAL accounts need email verification
+        if (user.getAuthProvider() != AuthProvider.LOCAL) {
+            return ApiResponse.success(generic);
+        }
+
+        if (user.isEmailVerified()) {
+            return ApiResponse.success("Email is already verified.");
+        }
+
+        String rawToken = UUID.randomUUID().toString();
+        String hashed = tokenHashUtil.sha256(rawToken);
+
+        user.setVerificationTokenHash(hashed);
+        user.setVerificationTokenExpiresAt(LocalDateTime.now().plusMinutes(30));
+        userRepo.save(user);
+
+        String verifyUrl = frontendBaseUrl + "/verify-email?token=" + rawToken;
+        emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), verifyUrl);
+
+        return ApiResponse.success(generic);
     }
 
     public User getUserFromToken(String token) {
