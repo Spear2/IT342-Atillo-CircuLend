@@ -5,6 +5,7 @@ import authImg from '../../assets/Background.jpg'
 import logo from '../../assets/Logo.png'
 import { setToken, setRole } from "../../security/auth"
 import Footer from "../../Components/Shared/Footer/Footer"
+import { apiFetch } from "../../Utils/apiFetch";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -20,64 +21,55 @@ const LoginPage = () => {
   });
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+      const { name, value } = event.target;
+      setForm((prev) => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  setError(null);
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
-  if (!form.email || !form.password) {
-    alert("Please fill in both email and password.");
-    setIsSubmitting(false);
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_BASE}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: form.email,
-        password: form.password
-      }),
-    });
-
-    const data = await response.json();
-    
-   
-
-    if (!response.ok) {
-      alert(data.error?.message || "Invalid email or password.");
+    if (!form.email || !form.password) {
+      setError("Please fill in both email and password.");
+      setIsSubmitting(false);
       return;
     }
 
-    const token = data.data?.accessToken;
-    const role = data.data?.user?.role || "BORROWER";
+    try {
+      const body = await apiFetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password
+        }),
+      });
 
-    if (!token) {
-      throw new Error("Token missing from server response!");
+      const token = body.data?.accessToken;
+      const role = body.data?.user?.role || "BORROWER";
+
+      setToken(token);
+      setRole(role);
+
+      if (role.toUpperCase() === "ADMIN") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/borrower", { replace: true });
+      }
+
+    } catch (err) {
+
+      if (err.code === "AUTH-004") {
+        setError("Email not verified. Please check your email.");
+      } else {
+        setError(err.message);
+      }
+
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setToken(token);
-    setRole(role);
-
-    alert("Login successful!");
-
-    if (role.toUpperCase() === "ADMIN") {
-      navigate("/admin", { replace: true });
-    } else {
-      navigate("/borrower", { replace: true });
-    }
-
-  } catch (err) {
-    setError(err.message || "System unreachable. Please try again later.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <div className="login-page">

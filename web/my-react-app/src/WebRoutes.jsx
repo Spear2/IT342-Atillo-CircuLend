@@ -7,6 +7,7 @@ import BorrowerDashboard from "./BorrowerDashboardRoutes";
 import AdminDashboard from "./AdminDashboardRoutes"
 import VerifyEmailPage from "./pages/EmailVerification/EmailVerificationPage";
 
+
 function RoleProtectedRoute({ allowedRoles, children }) {
   const token = getToken();
   const role = (getRole() || "").toUpperCase();

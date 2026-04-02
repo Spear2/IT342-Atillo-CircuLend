@@ -5,10 +5,12 @@ import edu.cit.atillo.circulend.dto.*;
 import edu.cit.atillo.circulend.entity.User;
 import edu.cit.atillo.circulend.entity.enums.AuthProvider;
 import edu.cit.atillo.circulend.entity.enums.Role;
+import edu.cit.atillo.circulend.exception.AuthException;
 import edu.cit.atillo.circulend.repository.UserRepository;
 import edu.cit.atillo.circulend.security.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +43,13 @@ public class AuthService {
 
     public LoginDataDTO login(LoginRequestDTO dto) {
         User user = userRepo.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AuthException("AUTH-001", "Invalid credentials", HttpStatus.UNAUTHORIZED));
         if (user.getAuthProvider() == AuthProvider.LOCAL) {
             if (user.getPassword() == null || !passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-                throw new RuntimeException("Invalid password");
+                throw new AuthException("AUTH-001", "Invalid credentials", HttpStatus.UNAUTHORIZED);
             }
             if (!user.isEmailVerified()) {
-                throw new RuntimeException("AUTH-004: Email not verified");
+                throw new AuthException("AUTH-004", "Email not verified", HttpStatus.FORBIDDEN);
             }
         }
         String token = tokenProvider.createToken(user.getUserId(), user.getRole().name());
@@ -56,7 +58,7 @@ public class AuthService {
 
     public UserResponseDTO registration(RegisterDTO dto) {
         if (userRepo.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new AuthException("AUTH-005", "Email already exists", HttpStatus.CONFLICT);
         }
         User user = new User();
         user.setFirstName(dto.getFirstName());
@@ -94,7 +96,11 @@ public class AuthService {
     public User getUserFromToken(String token) {
         Long userId = tokenProvider.getUserIdFromToken(token);
         return userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AuthException(
+                        "AUTH-002",
+                        "Invalid or expired token",
+                        HttpStatus.UNAUTHORIZED
+                ));
     }
 
 
