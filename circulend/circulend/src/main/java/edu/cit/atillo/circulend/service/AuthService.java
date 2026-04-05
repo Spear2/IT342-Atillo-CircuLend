@@ -2,10 +2,13 @@ package edu.cit.atillo.circulend.service;
 
 import edu.cit.atillo.circulend.Util.TokenHashUtil;
 import edu.cit.atillo.circulend.dto.*;
+import edu.cit.atillo.circulend.entity.AuditLog;
 import edu.cit.atillo.circulend.entity.User;
+import edu.cit.atillo.circulend.entity.enums.AuditActionType;
 import edu.cit.atillo.circulend.entity.enums.AuthProvider;
 import edu.cit.atillo.circulend.entity.enums.Role;
 import edu.cit.atillo.circulend.exception.AuthException;
+import edu.cit.atillo.circulend.repository.AuditLogRepository;
 import edu.cit.atillo.circulend.repository.UserRepository;
 import edu.cit.atillo.circulend.security.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +23,12 @@ import java.util.UUID;
 
 @Service
 public class AuthService {
-    @Autowired
     private final UserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final EmailService emailService;
     private final TokenHashUtil tokenHashUtil;
-
+    private final AuditLogRepository auditLogRepository;
     @Value("${app.frontend.base-url:http://localhost:5173}")
     private String frontendBaseUrl;
 
@@ -34,12 +36,14 @@ public class AuthService {
                        PasswordEncoder passwordEncoder,
                        TokenProvider tokenProvider,
                        EmailService emailService,
-                       TokenHashUtil tokenHashUtil) {
+                       TokenHashUtil tokenHashUtil,
+                       AuditLogRepository auditLogRepository) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.emailService = emailService;
         this.tokenHashUtil = tokenHashUtil;
+        this.auditLogRepository = auditLogRepository;
     }
 
     public LoginDataDTO login(LoginRequestDTO dto) {
@@ -58,6 +62,7 @@ public class AuthService {
     }
 
     public UserResponseDTO registration(RegisterDTO dto) {
+
         if (userRepo.existsByEmail(dto.getEmail())) {
             throw new AuthException("AUTH-005", "Email already exists", HttpStatus.CONFLICT);
         }
@@ -74,8 +79,16 @@ public class AuthService {
         user.setVerificationTokenExpiresAt(java.time.LocalDateTime.now().plusMinutes(30));
         User saved = userRepo.save(user);
         String verifyUrl = frontendBaseUrl + "/verify-email?token=" + rawToken;
-        emailService.sendVerificationEmail(saved.getEmail(), saved.getFirstName(), verifyUrl);
+
+
+        boolean sent = emailService.sendVerificationEmail(saved.getEmail(), saved.getFirstName(), verifyUrl);
+
+        writeSmtpAudit(saved, sent,
+                sent ? "Verification email sent for registration" : "Verification email failed for registration");
+
         return UserResponseDTO.fromUser(saved);
+
+
     }
 
     public ApiResponse<String> verifyEmail(String rawToken) {
@@ -94,11 +107,19 @@ public class AuthService {
                     HttpStatus.BAD_REQUEST
             );
         }
+
         user.setEmailVerified(true);
         user.setVerifiedAt(LocalDateTime.now());
         user.setVerificationTokenHash(null);
         user.setVerificationTokenExpiresAt(null);
         userRepo.save(user);
+
+        boolean sent = emailService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
+
+        writeSmtpAudit(user, sent,
+                sent ? "Welcome email sent after verification" : "Welcome email failed after verification");
+
+
         return ApiResponse.success("Email verified successfully.");
     }
 
@@ -131,7 +152,12 @@ public class AuthService {
         userRepo.save(user);
 
         String verifyUrl = frontendBaseUrl + "/verify-email?token=" + rawToken;
-        emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), verifyUrl);
+
+        boolean sent = emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), verifyUrl);
+
+        writeSmtpAudit(user, sent,
+                sent ? "Verification email resent" : "Verification email resend failed");
+
 
         return ApiResponse.success(generic);
     }
@@ -146,6 +172,12 @@ public class AuthService {
                 ));
     }
 
-
+    private void writeSmtpAudit(User user, boolean sent, String description) {
+        AuditLog log = new AuditLog();
+        log.setUser(user);
+        log.setActionType(sent ? AuditActionType.SMTP_SENT : AuditActionType.SMTP_FAILED);
+        log.setDescription(description);
+        auditLogRepository.save(log);
+    }
 
 }

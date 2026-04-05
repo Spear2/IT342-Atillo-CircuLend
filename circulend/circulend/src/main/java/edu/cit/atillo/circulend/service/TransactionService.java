@@ -30,6 +30,7 @@ public class TransactionService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final AuditLogRepository auditLogRepository;
+    private final EmailService emailService;
 
     @Transactional
     public BorrowResponseDTO borrow(BorrowRequestDTO req, Long userId) {
@@ -58,8 +59,14 @@ public class TransactionService {
         Transaction saved = transactionRepository.save(tx);
         itemRepository.save(item);
 
-        writeAudit(user, AuditActionType.BORROW_CONFIRMED,
-                "User borrowed item: " + item.getName() + " (" + item.getAssetTag() + ")");
+        boolean sent = emailService.sendBorrowReceipt(
+                user.getEmail(),
+                item.getName(),
+                saved.getBorrowDate().toString()
+        );
+        writeSmtpAudit(user, sent,
+                sent ? "Borrow receipt sent for tx " + saved.getTransactionId() +" ("+ item.getAssetTag()+")"
+                        : "Borrow receipt failed for tx " + saved.getTransactionId() + " ("+ item.getAssetTag()+")");
 
         return new BorrowResponseDTO(
                 saved.getTransactionId(),
@@ -98,8 +105,14 @@ public class TransactionService {
         transactionRepository.save(tx);
         itemRepository.save(item);
 
-        writeAudit(user, AuditActionType.RETURN_CONFIRMED,
-                "User returned item: " + item.getName() + " (" + item.getAssetTag() + ")");
+        boolean sent = emailService.sendReturnReceipt(
+                user.getEmail(),
+                item.getName(),
+                tx.getReturnDate().toString()
+        );
+        writeSmtpAudit(user, sent,
+                sent ? "Return receipt sent for tx " + tx.getTransactionId() +" ("+ item.getAssetTag() +")"
+                        : "Return receipt failed for tx " + tx.getTransactionId() +" ("+ item.getAssetTag() +")");
 
         return new ReturnResponseDTO(
                 tx.getTransactionId(),
@@ -135,10 +148,10 @@ public class TransactionService {
         );
     }
 
-    private void writeAudit(User user, AuditActionType actionType, String description) {
+    private void writeSmtpAudit(User user, boolean sent, String description) {
         AuditLog log = new AuditLog();
         log.setUser(user);
-        log.setActionType(actionType);
+        log.setActionType(sent ? AuditActionType.SMTP_SENT : AuditActionType.SMTP_FAILED);
         log.setDescription(description);
         auditLogRepository.save(log);
     }
