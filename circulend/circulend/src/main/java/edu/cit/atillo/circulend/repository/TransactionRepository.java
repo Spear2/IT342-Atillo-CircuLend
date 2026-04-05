@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByUserUserIdOrderByBorrowDateDesc(Long userId);
+    List<Transaction> findAllByOrderByBorrowDateDesc();
     Optional<Transaction> findByItemItemIdAndStatus(Long itemId, TransactionStatus status);
 }
