@@ -3,6 +3,7 @@ package edu.cit.atillo.circulend.service;
 import edu.cit.atillo.circulend.dto.item.CreateItemRequest;
 import edu.cit.atillo.circulend.dto.item.ItemResponseDTO;
 import edu.cit.atillo.circulend.dto.item.UpdateItemRequest;
+import edu.cit.atillo.circulend.dto.page.PagedResponseDTO;
 import edu.cit.atillo.circulend.entity.Category;
 import edu.cit.atillo.circulend.entity.Item;
 import edu.cit.atillo.circulend.entity.enums.ItemStatus;
@@ -10,6 +11,10 @@ import edu.cit.atillo.circulend.repository.CategoryRepository;
 import edu.cit.atillo.circulend.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -149,5 +154,27 @@ public class ItemService {
             case "image/webp" -> "webp";
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported image type");
         };
+    }
+
+
+    public PagedResponseDTO<ItemResponseDTO> searchItems(
+            String query, Long categoryId, String status, int page, int size
+    ) {
+        ItemStatus itemStatus = null;
+        if (status != null && !status.isBlank()) {
+            itemStatus = ItemStatus.valueOf(status.toUpperCase());
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Item> result = itemRepository.searchItems(
+                (query == null || query.isBlank()) ? null : query.trim(),
+                categoryId,
+                itemStatus,
+                pageable
+        );
+
+        List<ItemResponseDTO> content = result.getContent().stream().map(ItemResponseDTO::from).toList();
+        return new PagedResponseDTO<>(content, result.getNumber(), result.getSize(),
+                result.getTotalElements(), result.getTotalPages(), result.isLast());
     }
 }
