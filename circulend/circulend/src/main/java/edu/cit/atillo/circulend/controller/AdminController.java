@@ -11,9 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 public class AdminController {
 
+
+
+
     @GetMapping("/ping")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<String>> ping() {
         return ResponseEntity.ok(ApiResponse.success("Admin route is accessible."));
     }
+
+
+
 }
