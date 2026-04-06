@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import BorrowerNavbar from "../../../Components/Borrower/BorrowerNavbar/Navbar";
-import Footer from "../../../Components/Shared/Footer/Footer";
+import Footer from "../../../Components/Shared/Footer/Footer"
 import ItemCard from "../../../Components/Borrower/ItemCategoriesCard/ItemCard";
 import { apiFetch } from "../../../Utils/apiFetch";
 import { getAuthHeader } from "../../../security/auth";
@@ -64,9 +64,6 @@ export default function ExploreItemsPage() {
             ...getAuthHeader(),
           },
         });
-
-       
-
         if (cancelled) return;
         const data = body.data || {};
         setItems(data.content || []);

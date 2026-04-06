@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import './Navbar.css';
 import * as auth from '../../../security/auth'
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate, NavLink } from 'react-router-dom';
+import logo from "../../../assets/Logo.png"
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
+
 
   const handleLogout = () =>{
     auth.logout();
@@ -14,11 +15,12 @@ const Navbar = () => {
     navigate('/login');
   }
 
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
         <div className="logo">
-          <span className="logo-icon">🔄</span>
+          <img src={logo} alt="CircuLend Logo" className="logo-illustration"/>
           <span className="logo-text">CircuLend</span>
         </div>
         <div className="search-container">
@@ -33,8 +35,17 @@ const Navbar = () => {
 
       <div className="navbar-right">
         <ul className="nav-links">
-          <li><a href="/home">Home</a></li>
-          <li><a href="/dashboard" className="active">Dashboard</a></li>
+          <li>
+            <NavLink to="/borrower" className={({ isActive }) => isActive ? "active" : ""}>
+              Home
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/borrower/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
+              Dashboard
+            </NavLink>
+          </li>
         </ul>
 
         <div className="user-profile-section">
