@@ -51,7 +51,7 @@ const Navbar = () => {
         <div className="user-profile-section">
           <div className='dropdown-wrapper'>
             <div className="user-dropdown" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              <span className="user-name">John Doe</span>
+              <span className="user-name">Ronel Atillo</span>
               <span className={`arrow ${dropdownOpen ? 'up' : 'down'}`}>▾</span>
             </div>
 
