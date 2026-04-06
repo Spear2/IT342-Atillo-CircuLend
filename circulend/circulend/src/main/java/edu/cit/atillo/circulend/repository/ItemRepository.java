@@ -18,13 +18,14 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("""
     SELECT i FROM Item i
     WHERE (:query IS NULL OR
-           LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) OR
-           LOWER(i.description) LIKE LOWER(CONCAT('%', :query, '%')))
+           LOWER(i.name) LIKE :pattern OR
+           LOWER(i.description) LIKE :pattern)
       AND (:categoryId IS NULL OR i.category.categoryId = :categoryId)
       AND (:status IS NULL OR i.status = :status)
 """)
     Page<Item> searchItems(
             @Param("query") String query,
+            @Param("pattern") String pattern,   // ← new param
             @Param("categoryId") Long categoryId,
             @Param("status") ItemStatus status,
             Pageable pageable

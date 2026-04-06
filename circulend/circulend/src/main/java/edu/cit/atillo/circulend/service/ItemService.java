@@ -161,13 +161,25 @@ public class ItemService {
             String query, Long categoryId, String status, int page, int size
     ) {
         ItemStatus itemStatus = null;
+
         if (status != null && !status.isBlank()) {
-            itemStatus = ItemStatus.valueOf(status.toUpperCase());
+            try {
+                itemStatus = ItemStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "VALID-001: Invalid status. Allowed: AVAILABLE, BORROWED, MAINTENANCE"
+                );
+            }
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        String trimmedQuery = (query == null || query.isBlank()) ? null : query.trim();
+        String pattern = trimmedQuery != null ? "%" + trimmedQuery.toLowerCase() + "%" : null;
+
         Page<Item> result = itemRepository.searchItems(
-                (query == null || query.isBlank()) ? null : query.trim(),
+                trimmedQuery,
+                pattern,
                 categoryId,
                 itemStatus,
                 pageable
