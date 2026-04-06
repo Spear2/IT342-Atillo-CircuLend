@@ -22,7 +22,7 @@ public class ItemResponseDTO {
                 item.getName(),
                 item.getDescription(),
                 item.getAssetTag(),
-                item.getStatus().name(),
+                item.getStatus() != null ? item.getStatus().name() : "AVAILABLE",
                 item.getImageFileUrl(),
                 item.getCategory() != null ? item.getCategory().getCategoryId() : null,
                 item.getCategory() != null ? item.getCategory().getName() : null
