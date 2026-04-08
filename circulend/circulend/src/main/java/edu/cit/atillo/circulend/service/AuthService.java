@@ -8,10 +8,10 @@ import edu.cit.atillo.circulend.entity.enums.AuditActionType;
 import edu.cit.atillo.circulend.entity.enums.AuthProvider;
 import edu.cit.atillo.circulend.entity.enums.Role;
 import edu.cit.atillo.circulend.exception.AuthException;
+import edu.cit.atillo.circulend.factory.UserFactory;
 import edu.cit.atillo.circulend.repository.AuditLogRepository;
 import edu.cit.atillo.circulend.repository.UserRepository;
 import edu.cit.atillo.circulend.security.TokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,29 +66,23 @@ public class AuthService {
         if (userRepo.existsByEmail(dto.getEmail())) {
             throw new AuthException("AUTH-005", "Email already exists", HttpStatus.CONFLICT);
         }
-        User user = new User();
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(Role.BORROWER);
-        user.setAuthProvider(AuthProvider.LOCAL);
-        user.setEmailVerified(false);
         String rawToken = UUID.randomUUID().toString();
-        user.setVerificationTokenHash(tokenHashUtil.sha256(rawToken));
-        user.setVerificationTokenExpiresAt(java.time.LocalDateTime.now().plusMinutes(30));
+        String verificationHash = tokenHashUtil.sha256(rawToken);
+        LocalDateTime verificationExpires = LocalDateTime.now().plusMinutes(30);
+        User user = UserFactory.newLocalUserForRegistration(
+                dto,
+                passwordEncoder.encode(dto.getPassword()),
+                verificationHash,
+                verificationExpires
+        );
         User saved = userRepo.save(user);
         String verifyUrl = frontendBaseUrl + "/verify-email?token=" + rawToken;
-
-
         boolean sent = emailService.sendVerificationEmail(saved.getEmail(), saved.getFirstName(), verifyUrl);
 
         writeSmtpAudit(saved, sent,
                 sent ? "Verification email sent for registration" : "Verification email failed for registration");
 
         return UserResponseDTO.fromUser(saved);
-
-
     }
 
     public ApiResponse<String> verifyEmail(String rawToken) {
