@@ -8,6 +8,8 @@ import Footer from "../../../Components/Shared/Footer/Footer";
 import { apiFetch } from "../../../Utils/apiFetch";
 import { getAuthHeader } from "../../../security/auth";
 
+import { getApiClient } from "../../../api/ApiClientSingleton";
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const formatDate = (value) => {
@@ -28,6 +30,7 @@ export default function BorrowerDashboard() {
   const [historyPage, setHistoryPage] = useState(0);
   const pageSize = 5;
 
+
   // Return modal states
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [selectedTx, setSelectedTx] = useState(null);
@@ -38,12 +41,14 @@ export default function BorrowerDashboard() {
     setLoading(true);
     setError("");
     try {
-      const body = await apiFetch(`${API_BASE}/api/transactions/user`, {
+      const body = await getApiClient().request("/api/transactions/user", {
         method: "GET",
-        headers: { ...getAuthHeader() },
+        headers: { "Content-Type": "application/json" },
       });
 
-      const tx = Array.isArray(body?.data) ? body.data : [];
+      const bodyData = await body.json();
+
+      const tx = Array.isArray(bodyData?.data) ? bodyData.data : [];
       setTransactions(tx);
 
       const uniqueItemIds = [...new Set(tx.map((t) => t.itemId).filter(Boolean))];
@@ -131,12 +136,9 @@ export default function BorrowerDashboard() {
     setReturnError("");
 
     try {
-      await apiFetch(`${API_BASE}/api/transactions/return/${selectedTx.transactionId}`, {
+      await getApiClient().request(`/api/transactions/return/${selectedTx.transactionId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...getAuthHeader(),
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           assetTag: returnAssetTag.trim(),
         }),

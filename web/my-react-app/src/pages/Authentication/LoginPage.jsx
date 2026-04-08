@@ -5,9 +5,7 @@ import authImg from '../../assets/Background.jpg'
 import logo from '../../assets/Logo.png'
 import { setToken, setRole } from "../../security/auth"
 import Footer from "../../Components/Shared/Footer/Footer"
-import { apiFetch } from "../../Utils/apiFetch";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { getApiClient } from "../../api/ApiClientSingleton";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -37,17 +35,19 @@ const LoginPage = () => {
     }
 
     try {
-      const body = await apiFetch(`${API_BASE}/api/auth/login`, {
+      const response = await getApiClient().request("/api/auth/login", {
         method: "POST",
+        auth: false, 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: form.email,
-          password: form.password
+          email: form.email.trim(),
+          password: form.password,
         }),
       });
-
-      const token = body.data?.accessToken;
-      const role = body.data?.user?.role || "BORROWER";
+      const data = await response.json();
+      console.log("Login response:", data);
+      const token = data?.data?.accessToken;
+      const role = data?.data?.user?.role || "BORROWER";
 
       setToken(token);
       setRole(role);

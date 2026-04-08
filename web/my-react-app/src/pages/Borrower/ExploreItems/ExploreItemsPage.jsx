@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import BorrowerNavbar from "../../../Components/Borrower/BorrowerNavbar/Navbar";
 import Footer from "../../../Components/Shared/Footer/Footer"
 import ItemCard from "../../../Components/Borrower/ItemCategoriesCard/ItemCard";
-import { apiFetch } from "../../../Utils/apiFetch";
-import { getAuthHeader } from "../../../security/auth";
+import { getApiClient } from "../../../api/ApiClientSingleton";
 import "./ExploreItemsPage.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
@@ -42,14 +41,18 @@ export default function ExploreItemsPage() {
   });
 
   const requestUrl = useMemo(() => {
-    const params = new URLSearchParams();
-    if (query.trim()) params.set("query", query.trim());
-    if (categoryId) params.set("categoryId", categoryId);
-    if (status) params.set("status", status);
-    params.set("page", String(page));
-    params.set("size", String(size));
-    return `${API_BASE}/api/items?${params.toString()}`;
-  }, [query, categoryId, status, page, size]);
+  const params = new URLSearchParams();
+
+  if (query.trim()) params.set("query", query.trim());
+  if (categoryId) params.set("categoryId", categoryId);
+  if (status) params.set("status", status);
+
+  params.set("page", String(page));
+  params.set("size", String(size));
+
+  return `/api/items?${params.toString()}`;
+
+}, [query, categoryId, status, page, size]);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,14 +61,16 @@ export default function ExploreItemsPage() {
       setLoading(true);
       setError("");
       try {
-        const body = await apiFetch(requestUrl, {
+        const res = await getApiClient().request(requestUrl, {
           method: "GET",
-          headers: {
-            ...getAuthHeader(),
-          },
         });
+
+        const body = await res.json();
+
         if (cancelled) return;
+
         const data = body.data || {};
+
         setItems(data.content || []);
         setPagination({
           totalPages: data.totalPages || 0,
