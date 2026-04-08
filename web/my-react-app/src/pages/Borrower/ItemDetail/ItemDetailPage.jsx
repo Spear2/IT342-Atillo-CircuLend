@@ -2,13 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import BorrowerNavbar from "../../../Components/Borrower/BorrowerNavbar/Navbar";
 import Footer from "../../../Components/Shared/Footer/Footer";
-import { apiFetch } from "../../../Utils/apiFetch";
-import { getAuthHeader } from "../../../security/auth";
 import SimilarItemCard from "../../../Components/Borrower/ItemDetailCard/ItemDetailCard"
 import Camera from "../../../assets/camera.jpg"
 import "./ItemDetailPage.css";
+import { getApiClient } from "../../../api/ApiClientSingleton";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 function statusLabel(status) {
   const s = String(status || "").toUpperCase();
@@ -45,23 +43,25 @@ export default function ItemDetailPage() {
       setLoading(true);
       setError("");
       try {
-        const itemRes = await apiFetch(`${API_BASE}/api/items/${id}`, {
+        const itemRes = await getApiClient().request(`/api/items/${id}`, {
           method: "GET",
-          headers: { ...getAuthHeader() },
+          headers: { "Content-Type": "application/json" },
         });
 
         if (cancelled) return;
-        const detail = itemRes.data;
+        const itemData = await itemRes.json();
+        const detail = itemData.data;
         setItem(detail);
 
         // Fetch a page of items to simulate "Similar Items"
-        const listRes = await apiFetch(`${API_BASE}/api/items?page=0&size=20`, {
+        const listRes = await getApiClient().request("/api/items?page=0&size=20", {
           method: "GET",
-          headers: { ...getAuthHeader() },
+          headers: { "Content-Type": "application/json" },
         });
 
         if (cancelled) return;
-        const content = listRes?.data?.content || [];
+        const listdata = await listRes.json();
+        const content = listdata?.data?.content || [];
         const sameCategory = content.filter(
           (x) => x.itemId !== detail.itemId && x.categoryId === detail.categoryId
         );
@@ -107,12 +107,9 @@ export default function ItemDetailPage() {
     setBorrowSubmitting(true);
     setBorrowMessage("");
     try {
-      await apiFetch(`${API_BASE}/api/transactions/borrow`, {
+      await getApiClient().request("/api/transactions/borrow", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...getAuthHeader(),
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           itemId: item.itemId,
           assetTag: assetTagInput.trim(),
@@ -123,11 +120,13 @@ export default function ItemDetailPage() {
       setShowBorrowModal(false);
 
       // Refresh item status
-      const refreshed = await apiFetch(`${API_BASE}/api/items/${item.itemId}`, {
+      const refreshed = await getApiClient().request(`/api/items/${item.itemId}`, {
         method: "GET",
-        headers: { ...getAuthHeader() },
+        headers: { "Content-Type": "application/json" },
       });
-      setItem(refreshed.data);
+
+      const refreshedData = await refreshed.json();
+      setItem(refreshedData.data);
     } catch (err) {
       setBorrowMessage(err.message || "Borrow failed.");
     } finally {

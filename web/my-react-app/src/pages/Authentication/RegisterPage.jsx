@@ -4,9 +4,7 @@ import "./auth.css"; // Dedicated CSS for the login page
 import authImgs from "../../assets/Background.jpg"
 import logo from "../../assets/Logo.png"
 import Footer from "../../Components/Shared/Footer/Footer"
-import { apiFetch } from "../../Utils/apiFetch";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+import { getApiClient } from "../../api/ApiClientSingleton";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -63,12 +61,11 @@ const RegisterPage = () => {
     }
 
     try {
-      await apiFetch(`${API_BASE}/api/auth/register`, {
+      await getApiClient().request("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
+        auth: false,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
 
       alert("Registration successful! Check your email to verify your account.");
