@@ -82,17 +82,22 @@ export async function signInWithGooglePopup({ navigate }) {
   // A) send access token and verify with Google userinfo in backend
   // B) send profile + token
   const api = getApiClient();
-  const body = await api.post(
+  const res = await api.request(
     BACKEND_GOOGLE_ENDPOINT,
     {
       // Keep key as idToken only if your backend currently expects that exact key.
       // Better name is googleAccessToken, but keep backend/frontend consistent.
-      idToken: accessToken,
-      profile, // optional helper payload
-    },
-    { auth: false }
-  );
-
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        idToken: accessToken,
+        profile,
+      }),
+      auth: false,
+    });
+  const body = await res.json();
   const jwt = body?.data?.accessToken;
   const role = body?.data?.user?.role || "BORROWER";
 
