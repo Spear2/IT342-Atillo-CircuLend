@@ -1,18 +1,18 @@
-import React from 'react';
-import './Footer.css'
-const Footer = () => {
+import React from "react";
+import { Link } from "react-router-dom";
+import "./Footer.css";
+
+export default function Footer() {
   return (
-    <footer className="footer">
-      <div className="footer-links">
-        <span>About</span> |
-        <span>FAQs</span> |
-        <span>Support</span> |
-        <span>Terms</span> |
-        <span>Privacy</span>
+    <footer className="site-footer">
+      <div className="site-footer__inner">
+        <nav className="site-footer__links" aria-label="Footer">
+          <Link to="/">About</Link>
+          <Link to="/">FAQs</Link>
+          <Link to="/">Privacy Policy</Link>
+        </nav>
+        <p className="site-footer__copy">© {new Date().getFullYear()} CircuLend. All rights reserved.</p>
       </div>
-      <div>© 2022 CircuLend • All rights reserved.</div>
     </footer>
   );
-};
-
-export default Footer;
+}
