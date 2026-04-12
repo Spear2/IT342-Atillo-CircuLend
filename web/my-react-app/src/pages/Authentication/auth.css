@@ -18,89 +18,72 @@ html, body {
 }
 
 /* Replaces both .login-page and .register-page */
-.auth-page {
+.auth-page,
+.login-page,
+.register-page {
   min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+.auth-main {
+  flex: 0 1 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
-
-/* --- Header --- */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 24px;
-  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.08); 
-}
-.brand-container {
-  display: flex;
-  align-items: center;
-  gap: 3px; 
-}
-
-
-.logo-illustration {
-  height: 32px; 
-  width: auto;
-  object-fit: contain;
-}
-
-.brand-logo-text {
-  font-size: 1.5rem;
-  font-weight: 800;
-  background: linear-gradient(to right, #6366f1, #e879f9, #fb7185);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.5px;
-}
-
-.header-icons {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  font-size: 1.2rem;
-  color: #4b5563;
-}
-
-.dark-circle {
-  background-color: #374151;
-  color: white;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
+.login-page .site-footer,
+.register-page .site-footer,
+.auth-page .site-footer {
+  flex-shrink: 0;
 }
 
 /* --- Content Layout --- */
 .content-wrapper {
-  flex: 1;
+  flex: 0 1 auto;
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 50/50 split */
-  padding: 0 48px;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  padding: 1rem clamp(1rem, 4vw, 3rem) 2rem;
+  box-sizing: border-box;
 }
-
 .left-pane {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 20px;
+  align-items: flex-start;
+  padding: 0.5rem 0.5rem 1rem;
+  position: sticky;
+  top: 0;
+  align-self: start;
 }
-
 .auth-illustration {
   max-width: 100%;
+  width: 100%;
   height: auto;
   object-fit: contain;
-  max-height: 80vh; 
+  max-height: min(70vh, 520px);
 }
-
 .right-pane {
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 40px 0;
+  align-items: flex-start;
+  padding: 0.5rem 0 2rem;
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .content-wrapper {
+    grid-template-columns: 1fr;
+    padding-bottom: 2.5rem;
+  }
+  .left-pane {
+    position: static;
+  }
+  .auth-illustration {
+    max-height: min(40vh, 280px);
+  }
 }
 
 /* --- Form Container --- */
@@ -308,3 +291,4 @@ html, body {
   margin-bottom: 16px;
   text-align: center;
 }
+

@@ -1,0 +1,96 @@
+.shared-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e8eef0;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.shared-navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+}
+
+.shared-navbar__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.shared-navbar__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.shared-navbar__title-circu {
+  color: #4c1d95;
+}
+
+.shared-navbar__title-lend {
+  color: #20b2aa;
+}
+
+.shared-navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.shared-navbar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.shared-navbar__btn--outline {
+  color: #20b2aa;
+  border: 2px solid #20b2aa;
+  background: transparent;
+}
+
+.shared-navbar__btn--outline:hover {
+  background: rgba(32, 178, 170, 0.08);
+}
+
+.shared-navbar__btn--solid {
+  color: #ffffff;
+  background: #20b2aa;
+  border: 2px solid #20b2aa;
+}
+
+.shared-navbar__btn--solid:hover {
+  background: #1a9e97;
+  border-color: #1a9e97;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+  .shared-navbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .shared-navbar__title {
+    font-size: 1.15rem;
+  }
+
+  .shared-navbar__btn {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.875rem;
+  }
+}
