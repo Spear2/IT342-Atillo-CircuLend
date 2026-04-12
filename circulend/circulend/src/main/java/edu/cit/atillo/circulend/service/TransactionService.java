@@ -136,15 +136,23 @@ public class TransactionService {
     }
 
     private UserTransactionDTO toDto(Transaction tx) {
+        User u = tx.getUser();
+        String borrowerName = ((u.getFirstName() != null ? u.getFirstName() : "") + " "
+                + (u.getLastName() != null ? u.getLastName() : "")).trim();
+        if (borrowerName.isEmpty()) {
+            borrowerName = "—";
+        }
         return new UserTransactionDTO(
                 tx.getTransactionId(),
-                tx.getUser().getUserId(),
+                u.getUserId(),
                 tx.getItem().getItemId(),
                 tx.getItem().getName(),
                 tx.getItem().getAssetTag(),
                 tx.getBorrowDate(),
                 tx.getReturnDate(),
-                tx.getStatus().name()
+                tx.getStatus().name(),
+                u.getEmail(),
+                borrowerName
         );
     }
 

@@ -16,4 +16,7 @@ public class UserTransactionDTO {
     private LocalDateTime borrowDate;
     private LocalDateTime returnDate;
     private String status;
+
+    private String borrowerEmail;
+    private String borrowerName;
 }
