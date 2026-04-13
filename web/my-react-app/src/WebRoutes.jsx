@@ -6,6 +6,8 @@ import RegisterPage from "./pages/Authentication/RegisterPage";
 import BorrowerDashboard from "./BorrowerDashboardRoutes";
 import AdminDashboard from "./AdminDashboardRoutes"
 import VerifyEmailPage from "./pages/EmailVerification/EmailVerificationPage";
+import OAuth2SuccessPage from "./pages/Authentication/OAuth2SuccessPage";
+
 
 
 function RoleProtectedRoute({ allowedRoles, children }) {
@@ -24,6 +26,7 @@ function WebRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage/>}/>
       <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="/oauth2/success" element={<OAuth2SuccessPage />} />
 
 
       <Route

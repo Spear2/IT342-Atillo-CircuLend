@@ -26,14 +26,18 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
     public SecurityConfig(
             JwtAuthFilter jwtAuthFilter,
             RestAuthenticationEntryPoint restAuthenticationEntryPoint,
-            RestAccessDeniedHandler restAccessDeniedHandler
+            RestAccessDeniedHandler restAccessDeniedHandler,
+            OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler
     ) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
         this.restAccessDeniedHandler = restAccessDeniedHandler;
+        this.oAuth2LoginSuccessHandler=oAuth2LoginSuccessHandler;
     }
 
     @Bean
@@ -65,7 +69,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler)
                 )
 
-
+                .oauth2Login(oauth -> oauth
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 

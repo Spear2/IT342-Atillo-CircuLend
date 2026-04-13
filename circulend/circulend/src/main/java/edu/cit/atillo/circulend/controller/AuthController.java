@@ -50,10 +50,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.resendVerification(dto));
     }
 
-    @PostMapping("/google")
-    public ResponseEntity<ApiResponse<LoginDataDTO>> googleLogin(@RequestBody GoogleLoginRequestDTO dto) {
-        return ResponseEntity.ok(ApiResponse.success(authService.googleLogin(dto.getIdToken())));
-    }
 
 
 }

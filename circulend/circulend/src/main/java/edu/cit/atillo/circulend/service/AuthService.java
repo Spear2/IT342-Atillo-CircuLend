@@ -29,7 +29,6 @@ public class AuthService {
     private final EmailService emailService;
     private final TokenHashUtil tokenHashUtil;
     private final AuditLogRepository auditLogRepository;
-    private final GoogleTokenVerifierService googleTokenVerifierService;
 
     @Value("${app.frontend.base-url:http://localhost:5173}")
     private String frontendBaseUrl;
@@ -39,15 +38,13 @@ public class AuthService {
                        TokenProvider tokenProvider,
                        EmailService emailService,
                        TokenHashUtil tokenHashUtil,
-                       AuditLogRepository auditLogRepository,
-                       GoogleTokenVerifierService googleTokenVerifierService) {
+                       AuditLogRepository auditLogRepository) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.emailService = emailService;
         this.tokenHashUtil = tokenHashUtil;
         this.auditLogRepository = auditLogRepository;
-        this.googleTokenVerifierService=googleTokenVerifierService;
     }
 
     public LoginDataDTO login(LoginRequestDTO dto) {
@@ -119,44 +116,6 @@ public class AuthService {
 
 
         return ApiResponse.success("Email verified successfully.");
-    }
-
-
-    public LoginDataDTO googleLogin(String idTokenString) {
-        var payload = googleTokenVerifierService.verify(idTokenString);
-
-        String email = payload.getEmail();
-        String sub = payload.getSubject();
-        String firstName = (String) payload.get("given_name");
-        String lastName = (String) payload.get("family_name");
-
-        if (email == null || sub == null) {
-            throw new AuthException("AUTH-001", "Google account data is incomplete", HttpStatus.UNAUTHORIZED);
-        }
-
-        User user = userRepo.findByGoogleSub(sub)
-                .or(() -> userRepo.findByEmail(email))
-                .orElseGet(User::new);
-
-        if (user.getUserId() == null) {
-            user.setEmail(email);
-            user.setFirstName(firstName != null ? firstName : "Google");
-            user.setLastName(lastName != null ? lastName : "User");
-            user.setRole(Role.BORROWER);
-        }
-
-        user.setAuthProvider(AuthProvider.GOOGLE);
-        user.setGoogleSub(sub);
-        user.setEmailVerified(true);
-        user.setVerifiedAt(java.time.LocalDateTime.now());
-
-        // Keep null password for GOOGLE users
-        user.setPassword(null);
-
-        User saved = userRepo.save(user);
-
-        String token = tokenProvider.createToken(saved.getUserId(), saved.getRole().name());
-        return new LoginDataDTO(UserResponseDTO.fromUser(saved), token, null);
     }
 
 

@@ -6,10 +6,8 @@ import Navbar from "../../Components/Shared/Navbar/Navbar"
 import { setToken, setRole } from "../../security/auth"
 import Footer from "../../Components/Shared/Footer/Footer"
 import { getApiClient } from "../../api/ApiClientSingleton";
-import { signInWithGooglePopup } from "../../Utils/GooglePopupAuth";
 
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const LoginPage = () => {
@@ -24,12 +22,8 @@ const LoginPage = () => {
   });
 
 
-  const handleGoogleLogin = async () => {
-    try {
-      await signInWithGooglePopup({ navigate });
-    } catch (err) {
-      setError(err.message || "Google sign-in failed.");
-    }
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_BASE}/oauth2/authorization/google`;
   };
 
   const handleChange = (event) => {
