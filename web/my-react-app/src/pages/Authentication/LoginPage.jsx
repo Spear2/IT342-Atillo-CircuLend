@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams  } from "react-router-dom";
 import "./auth.css"; // Dedicated CSS for the login page
 import authImg from '../../assets/Background.jpg'
 import Navbar from "../../Components/Shared/Navbar/Navbar"
@@ -13,6 +13,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 const LoginPage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchParams] = useSearchParams();
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   
@@ -20,6 +21,19 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
+
+
+  useEffect(() => {
+    const oauth2 = searchParams.get("oauth2");
+    const genericError = searchParams.get("error");
+    if (oauth2 === "missing_token") {
+      setError("Google login failed: token was not returned.");
+    } else if (oauth2) {
+      setError(`Google login failed: ${decodeURIComponent(oauth2)}`);
+    } else if (genericError) {
+      setError("Google sign-in failed. Please try again.");
+    }
+  }, [searchParams]);
 
 
   const handleGoogleLogin = () => {

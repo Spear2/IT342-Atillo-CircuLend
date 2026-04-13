@@ -34,8 +34,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         String email = (String) oAuth2User.getAttributes().get("email");
         String sub = (String) oAuth2User.getAttributes().get("sub");
-        String firstName = (String) oAuth2User.getAttributes().getOrDefault("given_name", "Google");
-        String lastName = (String) oAuth2User.getAttributes().getOrDefault("family_name", "User");
+        String firstName = cleanName((String) oAuth2User.getAttributes().getOrDefault("given_name", "Google"));
+        String lastName = cleanName((String) oAuth2User.getAttributes().getOrDefault("family_name", "User"));
+
+        System.out.println("given_name: " + oAuth2User.getAttributes().get("given_name"));
+        System.out.println("family_name: " + oAuth2User.getAttributes().get("family_name"));
 
         User user = userRepo.findByGoogleSub(sub)
                 .or(() -> userRepo.findByEmail(email))
@@ -43,8 +46,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         if (user.getUserId() == null) {
             user.setEmail(email);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
+            user.setFirstName(lastName);
+            user.setLastName(firstName);
             user.setRole(Role.BORROWER);
         }
 
@@ -65,5 +68,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 .toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, redirect);
+    }
+
+    private String cleanName(String name) {
+        if (name == null) return "";
+        return name
+                .replace(",", "")   // remove trailing commas
+                .replaceAll("\\s+[A-Z]\\.$", "")  // remove middle initial like " C."
+                .trim();
     }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { setRole, setToken } from "../../security/auth";
 
@@ -9,6 +9,12 @@ export default function OAuth2SuccessPage() {
   useEffect(() => {
     const token = searchParams.get("token");
     const role = (searchParams.get("role") || "BORROWER").toUpperCase();
+    const oauthError = searchParams.get("error");
+
+    if (oauthError) {
+      navigate(`/login?oauth2=${encodeURIComponent(oauthError)}`, { replace: true });
+      return;
+    }
 
     if (!token) {
       navigate("/login?oauth2=missing_token", { replace: true });
@@ -18,11 +24,7 @@ export default function OAuth2SuccessPage() {
     setToken(token);
     setRole(role);
 
-    if (role === "ADMIN") {
-      navigate("/admin", { replace: true });
-    } else {
-      navigate("/borrower", { replace: true });
-    }
+    navigate(role === "ADMIN" ? "/admin?login=google_success" : "/borrower?login=google_success", {replace: true,});
   }, [navigate, searchParams]);
 
   return (
