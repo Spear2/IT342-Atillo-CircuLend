@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "./auth.css"; // Dedicated CSS for the login page
 import authImgs from "../../assets/Background.jpg"
 import Navbar from "../../Components/Shared/Navbar/Navbar"
@@ -11,7 +11,14 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+ const [searchParams] = useSearchParams();
+   const [error, setError] = useState(
+     searchParams.get("error")
+       ? "Google sign-in failed. Please try again."
+       : searchParams.get("oauth2") === "missing_token"
+       ? "Authentication error. Please try again."
+       : null
+   );
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
