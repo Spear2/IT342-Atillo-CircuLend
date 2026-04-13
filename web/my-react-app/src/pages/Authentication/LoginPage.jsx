@@ -156,7 +156,7 @@ const LoginPage = () => {
               </div>
 
               <button type="button" className="btn-google" onClick={handleGoogleLogin}>
-                <span className="google-icon">G</span> Continue with Google
+                <span className="google-icon">G</span> Sign in with Google
               </button>
 
               <div className="footer-links">
