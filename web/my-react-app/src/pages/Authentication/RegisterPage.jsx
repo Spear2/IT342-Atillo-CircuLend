@@ -6,6 +6,8 @@ import Navbar from "../../Components/Shared/Navbar/Navbar"
 import Footer from "../../Components/Shared/Footer/Footer"
 import { getApiClient } from "../../api/ApiClientSingleton";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,6 +23,10 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_BASE}/oauth2/authorization/google`;
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -210,7 +216,7 @@ const RegisterPage = () => {
                 <span>OR</span>
               </div>
 
-              <button type="button" className="btn-google">
+              <button type="button" className="btn-google" onClick={handleGoogleLogin}>
                 <span className="google-icon">G</span> Continue with Google
               </button>
 
