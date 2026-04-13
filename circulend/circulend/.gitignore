@@ -35,3 +35,7 @@ build/
 # Runtime uploaded files
 uploads/
 **/uploads/
+
+.env
+*.env
+.env.*
