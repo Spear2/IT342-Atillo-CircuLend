@@ -38,6 +38,8 @@
   color: white;
 }
 
+
+
 .admin-main-content {
   flex: 1;
   display: flex;
@@ -111,6 +113,7 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
+
 
 .badge.available { background: #c6f6d5; color: #22543d; }
 .badge.completed { background: #c6f6d5; color: #22543d; }
