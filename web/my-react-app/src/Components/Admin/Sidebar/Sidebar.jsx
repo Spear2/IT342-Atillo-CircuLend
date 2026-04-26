@@ -1,24 +1,32 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom'; // Using NavLink for automatic "active" class
-import './Sidebar.css';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import "./Sidebar.css";
 
 const Sidebar = () => {
+  const navClass = ({ isActive }) => (isActive ? "menu-item active" : "menu-item");
+
   return (
     <aside className="admin-sidebar">
-      <div className="sidebar-header">
-        Admin Dashboard
-      </div>
+      <div className="sidebar-header">Admin Dashboard</div>
+
       <nav className="sidebar-menu">
-        <NavLink to="/admin/inventory" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
-          <span className="icon">📊</span> Inventory
+        <NavLink to="/admin" end className={navClass}>
+          <span className="icon">📊</span> Overview
         </NavLink>
-        <NavLink to="/admin/transactions" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+
+        <NavLink to="/admin/inventory" className={navClass}>
+          <span className="icon">📦</span> Inventory
+        </NavLink>
+
+        <NavLink to="/admin/transactions" className={navClass}>
           <span className="icon">🔄</span> Transactions
         </NavLink>
-        <NavLink to="/admin/users" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+
+        <NavLink to="/admin/users" className={navClass}>
           <span className="icon">👥</span> Users
         </NavLink>
-        <NavLink to="/admin/logs" className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}>
+
+        <NavLink to="/admin/logs" className={navClass}>
           <span className="icon">🛡️</span> Audit Logs
         </NavLink>
       </nav>

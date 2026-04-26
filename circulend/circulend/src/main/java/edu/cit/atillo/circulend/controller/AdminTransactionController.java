@@ -19,7 +19,18 @@ public class AdminTransactionController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<UserTransactionDTO>>> getAllTransactions() {
-        return ResponseEntity.ok(ApiResponse.success(transactionService.getAllTransactions()));
+    public ResponseEntity<ApiResponse<List<UserTransactionDTO>>> getAllTransactions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+
+        List<UserTransactionDTO> all = transactionService.getAllTransactions();
+        int from = Math.min(safePage * safeSize, all.size());
+        int to = Math.min(from + safeSize, all.size());
+        List<UserTransactionDTO> slice = all.subList(from, to);
+
+        return ResponseEntity.ok(ApiResponse.success(slice));
     }
 }
