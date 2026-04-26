@@ -9,24 +9,18 @@ import edu.cit.atillo.circulend.entity.Item;
 import edu.cit.atillo.circulend.entity.enums.ItemStatus;
 import edu.cit.atillo.circulend.repository.CategoryRepository;
 import edu.cit.atillo.circulend.repository.ItemRepository;
+import edu.cit.atillo.circulend.service.storage.FileStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +28,7 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
-
-    @Value("${app.upload.dir:uploads/items}")
-    private String uploadDir;
+    private final FileStorageService fileStorageService;
 
     private static final long MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
     private static final List<String> ALLOWED_MIME_TYPES = List.of(
@@ -61,7 +53,8 @@ public class ItemService {
         Category category = categoryRepository.findById(req.getCategoryId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid categoryId"));
 
-        String imageUrl = saveImage(imageFile);
+        validateImage(imageFile);
+        String imageUrl = fileStorageService.uploadItemImage(imageFile);
 
         Item item = new Item();
         item.setName(req.getName().trim());
@@ -71,7 +64,13 @@ public class ItemService {
         item.setStatus(ItemStatus.AVAILABLE);
         item.setImageFileUrl(imageUrl);
 
-        return ItemResponseDTO.from(itemRepository.save(item));
+        try {
+            return ItemResponseDTO.from(itemRepository.save(item));
+        } catch (RuntimeException ex) {
+            // rollback uploaded file if DB save fails
+            fileStorageService.deleteByUrl(imageUrl);
+            throw ex;
+        }
     }
 
     public ItemResponseDTO updateItem(Long id, UpdateItemRequest req, MultipartFile imageFile) {
@@ -100,24 +99,45 @@ public class ItemService {
             item.setCategory(category);
         }
 
+        String oldImageUrl = item.getImageFileUrl();
+        String newImageUrl = null;
+
         if (imageFile != null && !imageFile.isEmpty()) {
-            item.setImageFileUrl(saveImage(imageFile));
+            validateImage(imageFile);
+            newImageUrl = fileStorageService.uploadItemImage(imageFile);
+            item.setImageFileUrl(newImageUrl);
         }
 
-        return ItemResponseDTO.from(itemRepository.save(item));
+        try {
+            Item saved = itemRepository.save(item);
+
+            // cleanup old image only after successful DB save
+            if (newImageUrl != null && oldImageUrl != null && !oldImageUrl.equals(newImageUrl)) {
+                fileStorageService.deleteByUrl(oldImageUrl);
+            }
+
+            return ItemResponseDTO.from(saved);
+        } catch (RuntimeException ex) {
+            // cleanup newly uploaded image if DB update fails
+            if (newImageUrl != null) {
+                fileStorageService.deleteByUrl(newImageUrl);
+            }
+            throw ex;
+        }
     }
 
     public void deleteItem(Long id) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
 
-        // Optional strict rule:
-        // if (item.getStatus() == ItemStatus.BORROWED) throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete borrowed item");
-
+        String imageUrl = item.getImageFileUrl();
         itemRepository.delete(item);
+
+        // best-effort storage cleanup
+        fileStorageService.deleteByUrl(imageUrl);
     }
 
-    private String saveImage(MultipartFile file) {
+    private void validateImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image file is required");
         }
@@ -130,32 +150,7 @@ public class ItemService {
         if (contentType == null || !ALLOWED_MIME_TYPES.contains(contentType.toLowerCase())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image type. Allowed: png, jpeg, webp");
         }
-
-        String ext = extensionFromContentType(contentType);
-        String filename = UUID.randomUUID() + "." + ext;
-
-        try {
-            Path dir = Paths.get(uploadDir);
-            Files.createDirectories(dir);
-
-            Path target = dir.resolve(filename).normalize();
-            file.transferTo(target);
-
-            return "/uploads/items/" + filename; // public URL path
-        } catch (IOException ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save image");
-        }
     }
-
-    private String extensionFromContentType(String contentType) {
-        return switch (contentType.toLowerCase()) {
-            case "image/png" -> "png";
-            case "image/jpeg" -> "jpg";
-            case "image/webp" -> "webp";
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported image type");
-        };
-    }
-
 
     public PagedResponseDTO<ItemResponseDTO> searchItems(
             String query, Long categoryId, String status, int page, int size
