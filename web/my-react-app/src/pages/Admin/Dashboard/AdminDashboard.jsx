@@ -5,9 +5,16 @@ import Footer from '../../../Components/Shared/Footer/Footer'
 import InventoryManagement from '../../../Components/Admin/InventoryTable/InventoryManagement';
 import GlobalTransactions from '../../../Components/Admin/TransactionTable/GlobalTransactions';
 import UserManagementTable from '../../../Components/Admin/UserManagementTable/UserManagementTable';
+import { useNavigate } from "react-router-dom";
 import './adminDashboard.css';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
+  const navigateToInvetoryAddItem = () =>{
+    navigate("/admin/inventory");
+  }
+
   return (
     <div className="admin-layout">
       <AdminSidebar />
@@ -17,7 +24,7 @@ const AdminDashboard = () => {
         <div className="admin-container">
           <header className="admin-header">
             <h1>Admin Overview</h1>
-            <button className="btn-add-item">+ Add New Item</button>
+            <button className="btn-add-item" onClick={navigateToInvetoryAddItem}>+ Add New Item</button>
           </header>
 
           {/* You can now easily toggle these or put them on separate routes */}
