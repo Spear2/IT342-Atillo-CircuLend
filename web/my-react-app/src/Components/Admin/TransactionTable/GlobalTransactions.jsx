@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getApiClient } from "../../../api/ApiClientSingleton";
+import transaction from "../../../assets/black-transaction.png"
 
 const formatDate = (value) => {
   if (!value) return "—";
@@ -47,7 +48,8 @@ const GlobalTransactions = () => {
   return (
     <section className="admin-card">
       <div className="card-header">
-        <span className="icon">⏳</span> Global Transaction Logs
+        <img className="card-header-icon-img" src={transaction} alt="" />
+        <span>Inventory Management</span>
       </div>
 
       <div className="table-responsive-wrapper">

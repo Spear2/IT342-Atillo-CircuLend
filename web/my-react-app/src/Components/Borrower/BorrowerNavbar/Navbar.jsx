@@ -1,75 +1,87 @@
-import React, { useState } from 'react';
-import './Navbar.css';
-import * as auth from '../../../security/auth'
-import { useNavigate, NavLink } from 'react-router-dom';
-import logo from "../../../assets/Logo.png"
+import React, { useEffect, useRef, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import * as auth from "../../../security/auth";
+import logo from "../../../assets/logo.png";
+import userIcon from "../../../assets/user.png"; // replace with borrower icon if you have one
+import chevronDown from "../../../assets/down-chevron.png";
+import "./Navbar.css";
+
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-
-  const handleLogout = () =>{
+  const handleLogout = () => {
     auth.logout();
     setDropdownOpen(false);
-    navigate('/login');
-  }
+    navigate("/login");
+  };
 
+  useEffect(() => {
+    const onClickOutside = (event) => {
+      if (!dropdownRef.current) return;
+      if (!dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    const onEsc = (event) => {
+      if (event.key === "Escape") setDropdownOpen(false);
+    };
+
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, []);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-left">
-        <div className="logo">
-          <img src={logo} alt="CircuLend Logo" className="logo-illustration"/>
-          <span className="logo-text">CircuLend</span>
-        </div>
-        <div className="search-container">
-          <span className="search-icon">🔍</span>
-          <input 
-            type="text" 
-            placeholder="Search items, collections..." 
-            className="search-input"
-          />
+    <nav className="borrower-navbar">
+      <div className="borrower-nav-left">
+        <div className="borrower-logo-section">
+          <img className="borrower-nav-icon borrower-nav-logo" src={logo} alt="CircuLend logo" />
+          <span className="borrower-logo-text">CircuLend</span>
         </div>
       </div>
 
-      <div className="navbar-right">
-        <ul className="nav-links">
-          <li>
-            <NavLink to="/borrower" className={({ isActive }) => isActive ? "active" : ""}>
-              Home
-            </NavLink>
-          </li>
+      <div className="borrower-nav-right">
+        <div className="borrower-nav-links">
+          <NavLink
+            to="/borrower"
+            end
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            Home
+          </NavLink>
 
-          <li>
-            <NavLink to="/borrower/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
-              Dashboard
-            </NavLink>
-          </li>
-        </ul>
+          <NavLink
+            to="/borrower/dashboard"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            Dashboard
+          </NavLink>
+        </div>
 
-        <div className="user-profile-section">
-          <div className='dropdown-wrapper'>
-            <div className="user-dropdown" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              <span className="user-name">Ronel Atillo</span>
-              <span className={`arrow ${dropdownOpen ? 'up' : 'down'}`}>▾</span>
+        <div className="borrower-profile-section" ref={dropdownRef}>
+          <button
+            className="borrower-dropdown-btn"
+            type="button"
+            onClick={() => setDropdownOpen((prev) => !prev)}
+          >
+            <img className="borrower-nav-icon borrower-nav-user" src={userIcon} alt="Borrower" />
+            <span>Borrower</span>
+            <img className="borrower-nav-icon borrower-nav-chevron" src={chevronDown} alt="Open menu" />
+          </button>
+
+          {dropdownOpen && (
+            <div className="borrower-menu">
+              <button type="button" className="borrower-logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
             </div>
-
-            {dropdownOpen && (
-            <div className="dropdown-menu">
-                <button className= "dropdown-item logout" onClick={handleLogout}>
-                  logout
-                </button>
-              </div>
-            )}
-            
-          </div>
-          
-          <div className="icon-group">
-            <button className="nav-icon-btn purple-bg">@</button>
-            <button className="nav-icon-btn blue-bg">✉️</button>
-            <button className="nav-icon-btn avatar-bg">😎</button>
-          </div>
+          )}
         </div>
       </div>
     </nav>

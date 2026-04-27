@@ -1,28 +1,42 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import "./auth.css"; // Dedicated CSS for the login page
-import authImgs from "../../assets/Background.jpg"
-import Navbar from "../../Components/Shared/Navbar/Navbar"
-import Footer from "../../Components/Shared/Footer/Footer"
+import "./auth.css";
+import authImgs from "../../assets/Background.jpg";
+import Navbar from "../../Components/Shared/Navbar/Navbar";
+import Footer from "../../Components/Shared/Footer/Footer";
 import { getApiClient } from "../../api/ApiClientSingleton";
+
+import password from "../../assets/lock.png";
+import hidden from "../../assets/hidden.png";
+import google from "../../assets/google.png";
+import email from "../../assets/email.png";
+import arrow from "../../assets/right-arrow.png";
+import unhidden from "../../assets/unhidden.png";
+import welcome from "../../assets/hello.png";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+const AUTH_ICONS = {
+  email,
+  password,
+  eyeOpen: hidden,
+  eyeClosed: unhidden,
+  arrow,
+  google,
+  welcome,
+};
+
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
- const [searchParams] = useSearchParams();
-   const [error, setError] = useState(
-     searchParams.get("error")
-       ? "Google sign-in failed. Please try again."
-       : searchParams.get("oauth2") === "missing_token"
-       ? "Authentication error. Please try again."
-       : null
-   );
+  const [error, setError] = useState(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -30,6 +44,19 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: "",
   });
+
+  useEffect(() => {
+    const oauth2 = searchParams.get("oauth2");
+    const genericError = searchParams.get("error");
+
+    if (oauth2 === "missing_token") {
+      setError("Google sign-up failed: token was not returned.");
+    } else if (oauth2) {
+      setError(`Google sign-up failed: ${decodeURIComponent(oauth2)}`);
+    } else if (genericError) {
+      setError("Google sign-up failed. Please try again.");
+    }
+  }, [searchParams]);
 
   const handleGoogleLogin = () => {
     window.location.href = `${API_BASE}/oauth2/authorization/google`;
@@ -39,9 +66,6 @@ const RegisterPage = () => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-
-
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,9 +107,8 @@ const RegisterPage = () => {
 
       alert("Registration successful! Check your email to verify your account.");
       navigate("/login");
-
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -93,32 +116,43 @@ const RegisterPage = () => {
 
   return (
     <div className="register-page">
-      <Navbar/>
-
+      <Navbar />
 
       <main className="auth-main">
-          <div className="content-wrapper">
-          
-          {/* Left Side: Completely blank per the design */}
-                  <div className="left-pane">
-                    <img 
-                      src={authImgs}
-                      alt="CircuLend Collaboration" 
-                      className="auth-illustration"
-                    />
-                  </div>
+        <div className="content-wrapper">
+          <div className="left-pane">
+            <div className="auth-hero-wrap">
+              <div className="auth-hero-caption-block">
+                <h2 className="auth-hero-heading">
+                  Join <span>CircuLend</span>
+                </h2>
+                <p className="auth-hero-subtext">
+                  Join a sustainable community sharing equipment and resources.
+                </p>
+              </div>
 
-          {/* Right Side: Floating Form */}
+              <img
+                src={authImgs}
+                alt="CircuLend collaboration"
+                className="auth-illustration"
+              />
+            </div>
+          </div>
+
           <div className="right-pane">
             <form className="form-container" onSubmit={handleSubmit}>
-              
-              <h2 className="form-title">Create an Account</h2>
+              <div className="title-row">
+                <h2 className="form-title">Create an Account</h2>
+                <img className="welcome-icon" src={AUTH_ICONS.welcome} alt="Create account" />
+              </div>
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="label" htmlFor="firstName">First Name</label>
+                  <label className="label" htmlFor="firstName">
+                    First Name
+                  </label>
                   <div className="input-wrapper">
-                    <span className="input-icon"></span> 
+                    <img className="input-icon-img" src={AUTH_ICONS.email} alt="" />
                     <input
                       id="firstName"
                       name="firstName"
@@ -131,11 +165,13 @@ const RegisterPage = () => {
                     />
                   </div>
                 </div>
-                
+
                 <div className="form-group">
-                  <label className="label" htmlFor="lastName">Last Name</label>
+                  <label className="label" htmlFor="lastName">
+                    Last Name
+                  </label>
                   <div className="input-wrapper">
-                    <span className="input-icon"></span>
+                    <img className="input-icon-img" src={AUTH_ICONS.email} alt="" />
                     <input
                       id="lastName"
                       name="lastName"
@@ -151,9 +187,11 @@ const RegisterPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="label" htmlFor="email">Email</label>
+                <label className="label" htmlFor="email">
+                  Email
+                </label>
                 <div className="input-wrapper">
-                  <span className="input-icon"></span>
+                  <img className="input-icon-img" src={AUTH_ICONS.email} alt="Email" />
                   <input
                     id="email"
                     name="email"
@@ -168,48 +206,64 @@ const RegisterPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="label" htmlFor="password">Password</label>
+                <label className="label" htmlFor="password">
+                  Password
+                </label>
                 <div className="input-wrapper">
-                  <span className="input-icon"></span>
+                  <img className="input-icon-img" src={AUTH_ICONS.password} alt="Password" />
                   <input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="HelloJrobinson@123"
+                    placeholder="Enter password"
                     value={form.password}
                     onChange={handleChange}
-                    className="input-field"
+                    className="input-field has-right-btn"
                     required
                   />
-                  <span 
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "" : ""}
-                  </span>
+                    <img
+                      className="toggle-icon-img"
+                      src={showPassword ? AUTH_ICONS.eyeClosed : AUTH_ICONS.eyeOpen}
+                      alt={showPassword ? "Hide" : "Show"}
+                    />
+                  </button>
                 </div>
               </div>
 
               <div className="form-group">
-                <label className="label" htmlFor="confirmPassword">Confirm Password</label>
+                <label className="label" htmlFor="confirmPassword">
+                  Confirm Password
+                </label>
                 <div className="input-wrapper">
-                  <span className="input-icon"></span>
+                  <img className="input-icon-img" src={AUTH_ICONS.password} alt="Confirm password" />
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="HelloJrobinson@123"
+                    placeholder="Re-enter password"
                     value={form.confirmPassword}
                     onChange={handleChange}
-                    className="input-field"
+                    className="input-field has-right-btn"
                     required
                   />
-                  <span 
-                    className="password-toggle"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
-                    {showConfirmPassword ? "" : ""}
-                  </span>
+                    <img
+                      className="toggle-icon-img"
+                      src={showConfirmPassword ? AUTH_ICONS.eyeClosed : AUTH_ICONS.eyeOpen}
+                      alt={showConfirmPassword ? "Hide" : "Show"}
+                    />
+                  </button>
                 </div>
               </div>
 
@@ -217,6 +271,7 @@ const RegisterPage = () => {
 
               <button className="btn-submit" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Creating..." : "Create Account"}
+                <img className="arrow-icon-img" src={AUTH_ICONS.arrow} alt="" />
               </button>
 
               <div className="divider">
@@ -224,18 +279,27 @@ const RegisterPage = () => {
               </div>
 
               <button type="button" className="btn-google" onClick={handleGoogleLogin}>
-                <span className="google-icon">G</span> Sign up with Google
+                <img className="google-btn-icon-img" src={AUTH_ICONS.google} alt="Google" />
+                Sign up with Google
               </button>
 
               <div className="footer-links">
-                <p>Already have an account? <Link to="/login" className="link-highlight">Sign in</Link></p>
-                <Link to="/terms" className="link-highlight terms-link">Terms & Conditions</Link>
+                <p>
+                  Already have an account?{" "}
+                  <Link to="/login" className="link-highlight">
+                    Sign in
+                  </Link>
+                </p>
+                <Link to="/terms" className="link-highlight terms-link">
+                  Terms & Conditions
+                </Link>
               </div>
             </form>
           </div>
         </div>
       </main>
-      <Footer/>
+
+      <Footer />
     </div>
   );
 };

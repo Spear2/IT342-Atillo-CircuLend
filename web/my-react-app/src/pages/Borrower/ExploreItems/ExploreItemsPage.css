@@ -61,11 +61,79 @@
 
 /* Toolbar */
 .explore-toolbar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  gap: 0.6rem;
   margin-bottom: 1rem;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1 1 320px;
+  min-width: 220px;
+}
+
+.search-input-wrap .search-input {
+  width: 100%;
+  padding-left: 34px;
+}
+
+.search-icon-img {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translateY(-50%);
+  opacity: 0.65;
+  pointer-events: none;
+  object-fit: contain;
+}
+
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-icon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  display: block;
+}
+
+.select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.toolbar-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  height: 38px;
+  min-width: 120px;
+  padding: 0 34px 0 10px; /* room for chevron */
+  border: 1px solid #d8e2e6;
+  background: #f6fbfc;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 0.86rem;
+}
+
+.select-chevron-img {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.75;
+  object-fit: contain;
 }
 
 .filter-btn,
@@ -82,12 +150,14 @@
 .filter-btn {
   padding: 0 0.8rem;
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .search-input {
   padding: 0 0.8rem;
-  width: 100%;
   outline: none;
+  flex: 1 1 320px;   /* grows, but has a base width */
+  min-width: 220px;  /* prevents collapsing too much */
 }
 
 .toolbar-right {
@@ -96,14 +166,31 @@
   gap: 0.45rem;
   font-size: 0.82rem;
   color: #4b5563;
+  margin-left: auto; /* keep right controls on the right */
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+}
+
+.toolbar-right label {
+  white-space: nowrap;
 }
 
 .explore-toolbar select {
   padding: 0 0.5rem;
+  min-width: 110px;
 }
 
 .icon-btn {
   width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid #d8e2e6;
+  background: #f6fbfc;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
   cursor: pointer;
 }
 
@@ -161,12 +248,10 @@
 
 /* Responsive */
 @media (max-width: 980px) {
-  .explore-toolbar {
-    grid-template-columns: 1fr;
-  }
-
   .toolbar-right {
-    flex-wrap: wrap;
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .item-grid {

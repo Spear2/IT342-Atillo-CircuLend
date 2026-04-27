@@ -5,7 +5,23 @@ import ItemCard from "../../../Components/Borrower/ItemCategoriesCard/ItemCard";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 import "./ExploreItemsPage.css";
 
+import filter from "../../../assets/filter.png"
+import grid from "../../../assets/grid.png"
+import listView from "../../../assets/list-view.png"
+import search from "../../../assets/search.png"
+import chevron from "../../../assets/down-chevron.png"
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+
+
+const TOOLBAR_ICONS = {
+  filter: filter,
+  grid: grid,
+  list: listView,
+  search: search,
+  chevron: chevron
+};
+
 
 const CATEGORY_OPTIONS = [
   { id: "", label: "All" },
@@ -128,52 +144,65 @@ export default function ExploreItemsPage() {
       <main className="explore-content">
         <div className="explore-toolbar">
           <button type="button" className="filter-btn">
-            &#x25BC; Filter
+            <img className="toolbar-icon-img" src={TOOLBAR_ICONS.filter} alt="" />
+            <span>Filter</span>
           </button>
 
-          <input
-            className="search-input"
-            placeholder="Search items"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(0);
-            }}
-          />
+          <div className="search-input-wrap">
+            <img className="search-icon-img" src={TOOLBAR_ICONS.search} alt="" />
+            <input
+              className="search-input"
+              placeholder="Search items"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(0);
+              }}
+            />
+          </div>
 
           <div className="toolbar-right">
             <label htmlFor="status-select">Status:</label>
-            <select
-              id="status-select"
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value);
-                setPage(0);
-              }}
-            >
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
+              <div className="select-wrap">
+                <select
+                  id="status-select"
+                  className="toolbar-select"
+                  value={status}
+                  onChange={(e) => {
+                    setStatus(e.target.value);
+                    setPage(0);
+                  }}
+                >
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+                <img className="select-chevron-img" src={TOOLBAR_ICONS.chevron} alt="" />
+              </div>
 
             <label htmlFor="sort-select">Sort by:</label>
-            <select
-              id="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option>Relevant</option>
-              <option>Newest</option>
-              <option>Name A-Z</option>
-            </select>
+              <div className="select-wrap">
+                <select
+                  id="sort-select"
+                  className="toolbar-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option>Relevant</option>
+                  <option>Newest</option>
+                  <option>Name A-Z</option>
+                </select>
+                <img className="select-chevron-img" src={TOOLBAR_ICONS.chevron} alt="" />
+              </div>
 
             <button type="button" className="icon-btn" title="Grid View">
-              &#9638;
+              <img className="toolbar-icon-img" src={TOOLBAR_ICONS.grid} alt="Grid view" />
             </button>
+
             <button type="button" className="icon-btn" title="List View">
-              &#9776;
+              <img className="toolbar-icon-img" src={TOOLBAR_ICONS.list} alt="List view" />
             </button>
           </div>
         </div>

@@ -1,31 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useSearchParams  } from "react-router-dom";
-import "./auth.css"; // Dedicated CSS for the login page
-import authImg from '../../assets/Background.jpg'
-import Navbar from "../../Components/Shared/Navbar/Navbar"
-import { setToken, setRole } from "../../security/auth"
-import Footer from "../../Components/Shared/Footer/Footer"
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import "./auth.css";
+import authImg from "../../assets/Background.jpg";
+import Navbar from "../../Components/Shared/Navbar/Navbar";
+import { setToken, setRole } from "../../security/auth";
+import Footer from "../../Components/Shared/Footer/Footer";
 import { getApiClient } from "../../api/ApiClientSingleton";
 
+import password from "../../assets/lock.png"
+import hidden from "../../assets/hidden.png"
+import google from "../../assets/google.png"
+import email from "../../assets/email.png"
+import arrow from "../../assets/right-arrow.png"
+import unhidden from "../../assets/unhidden.png"
+import welcome from "../../assets/hello.png"
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
+const AUTH_ICONS = {
+  email: email,
+  password: password,
+  eyeOpen: hidden,
+  eyeClosed: unhidden,
+  arrow: arrow,
+  google: google,
+  welcome: welcome,
+};
+
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchParams] = useSearchParams();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
 
+  const [form, setForm] = useState({ email: "", password: "" });
 
   useEffect(() => {
     const oauth2 = searchParams.get("oauth2");
     const genericError = searchParams.get("error");
+
     if (oauth2 === "missing_token") {
       setError("Google login failed: token was not returned.");
     } else if (oauth2) {
@@ -35,17 +49,16 @@ const LoginPage = () => {
     }
   }, [searchParams]);
 
-
   const handleGoogleLogin = () => {
     window.location.href = `${API_BASE}/oauth2/authorization/google`;
   };
 
   const handleChange = (event) => {
-      const { name, value } = event.target;
-      setForm((prev) => ({ ...prev, [name]: value }));
-    };
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
@@ -59,35 +72,27 @@ const LoginPage = () => {
     try {
       const response = await getApiClient().request("/api/auth/login", {
         method: "POST",
-        auth: false, 
+        auth: false,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: form.email.trim(),
           password: form.password,
         }),
       });
+
       const data = await response.json();
-      console.log("Login response:", data);
       const token = data?.data?.accessToken;
       const role = data?.data?.user?.role || "BORROWER";
 
       setToken(token);
       setRole(role);
-
-      if (role.toUpperCase() === "ADMIN") {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/borrower", { replace: true });
-      }
-
+      navigate(role.toUpperCase() === "ADMIN" ? "/admin" : "/borrower", { replace: true });
     } catch (err) {
-
       if (err.code === "AUTH-004") {
         setError("Email not verified. Please check your email.");
       } else {
-        setError(err.message);
+        setError(err.message || "Login failed. Please try again.");
       }
-
     } finally {
       setIsSubmitting(false);
     }
@@ -95,31 +100,41 @@ const LoginPage = () => {
 
   return (
     <div className="login-page">
-      <Navbar/>
-
+      <Navbar />
       <main className="auth-main">
-        {/* Main Content Split */}
         <div className="content-wrapper">
-          
-          {/* Left Side: Completely blank per the design */}
           <div className="left-pane">
-            <img 
-              src={authImg}
-              alt="CircuLend Collaboration" 
-              className="auth-illustration"
-            />
+            <div className="auth-hero-wrap">
+              <div className="auth-hero-caption-block">
+                <h2 className="auth-hero-heading">
+                  Welcome <span>CircuLend</span>
+                </h2>
+                <p className="auth-hero-subtext">
+                  Continue borrowing and sharing equipment with your campus community.
+                </p>
+              </div>
+
+              <img
+                src={authImg}
+                alt="CircuLend collaboration"
+                className="auth-illustration"
+              />
+            </div>
           </div>
 
-          {/* Right Side: Floating Form */}
-          <div className="right-pane">
+          <div className="right-pane" style={{marginTop:"60px"}}>
             <form className="form-container" onSubmit={handleSubmit}>
               
-              <h2 className="form-title">Welcome back 👋</h2>
+                <div className="title-row">
+                  <h2 className="form-title">Welcome back</h2>
+                  <img className="welcome-icon" src={AUTH_ICONS.welcome} alt="Welcome" />
+                </div>
+              
               <p className="form-subtitle">Log in your account</p>
 
               <div className="form-group">
                 <div className="input-wrapper">
-                  <span className="input-icon"></span>
+                  <img className="input-icon-img" src={AUTH_ICONS.email} alt="Email" />
                   <input
                     id="email"
                     name="email"
@@ -135,23 +150,29 @@ const LoginPage = () => {
 
               <div className="form-group">
                 <div className="input-wrapper">
-                  <span className="input-icon"></span>
+                  <img className="input-icon-img" src={AUTH_ICONS.password} alt="Password" />
                   <input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Hellojrobinson@123"
+                    placeholder="Enter password"
                     value={form.password}
                     onChange={handleChange}
-                    className="input-field"
+                    className="input-field has-right-btn"
                     required
                   />
-                  <span 
-                    className="password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? "" : ""}
-                  </span>
+                    <img
+                      className="toggle-icon-img"
+                      src={showPassword ? AUTH_ICONS.eyeClosed : AUTH_ICONS.eyeOpen}
+                      alt={showPassword ? "Hide" : "Show"}
+                    />
+                  </button>
                 </div>
               </div>
 
@@ -163,14 +184,14 @@ const LoginPage = () => {
 
               <button className="btn-submit" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Logging in..." : "Continue"}
+                <img className="arrow-icon-img" src={AUTH_ICONS.arrow} alt="" />
               </button>
 
-              <div className="divider">
-                <span>OR</span>
-              </div>
+              <div className="divider"><span>OR</span></div>
 
               <button type="button" className="btn-google" onClick={handleGoogleLogin}>
-                <span className="google-icon">G</span> Sign in with Google
+                <img className="google-btn-icon-img" src={AUTH_ICONS.google} alt="Google" />
+                Sign in with Google
               </button>
 
               <div className="footer-links">
@@ -180,8 +201,7 @@ const LoginPage = () => {
           </div>
         </div>
       </main>
-
-      <Footer/>
+      <Footer />
     </div>
   );
 };

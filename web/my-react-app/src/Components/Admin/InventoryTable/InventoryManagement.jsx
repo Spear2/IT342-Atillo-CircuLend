@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 
+import header from "../../../assets/black-inventory.png"
+import edit from "../../../assets/edit.png"
+import deleteIcon from "../../../assets/delete.png"
+
+const ICONS = {
+  header: header,
+  edit: edit,
+  delete: deleteIcon,
+};
+
 const InventoryManagement = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +53,8 @@ const InventoryManagement = () => {
   return (
     <section className="admin-card">
       <div className="card-header">
-        <span className="icon">🏫</span> Inventory Management
+        <img className="card-header-icon-img" src={ICONS.header} alt="" />
+        <span>Inventory Management</span>
       </div>
 
       <table className="admin-table">
@@ -97,8 +108,16 @@ const InventoryManagement = () => {
                   </span>
                 </td>
                 <td className="actions">
-                  <button className="icon-btn">✏️</button>
-                  <button className="icon-btn delete">🗑️</button>
+                  <button type="button" className="icon-btn" aria-label={`Edit ${item.name}`}>
+                    <img className="table-action-icon-img" src={ICONS.edit} alt="" />
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-btn delete"
+                    aria-label={`Delete ${item.name}`}
+                  >
+                    <img className="table-action-icon-img" src={ICONS.delete} alt="" />
+                  </button>
                 </td>
               </tr>
             ))}
