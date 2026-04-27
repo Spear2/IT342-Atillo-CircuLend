@@ -1,6 +1,18 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
+import overview from "../../../assets/overview.png"
+import log from "../../../assets/log.png"
+import user from "../../../assets/multiple-users-silhouette.png"
+import transaction from "../../../assets/transaction.png"
+import inventory from "../../../assets/inventory.png"
+const ICONS = {
+  overview: overview,
+  inventory: inventory,
+  transactions: transaction,
+  users: user,
+  logs: log,
+};
 
 const Sidebar = () => {
   const navClass = ({ isActive }) => (isActive ? "menu-item active" : "menu-item");
@@ -11,23 +23,28 @@ const Sidebar = () => {
 
       <nav className="sidebar-menu">
         <NavLink to="/admin" end className={navClass}>
-          <span className="icon">📊</span> Overview
+          <img className="side-icon" src={ICONS.overview} alt="" />
+          <span>Overview</span>
         </NavLink>
 
         <NavLink to="/admin/inventory" className={navClass}>
-          <span className="icon">📦</span> Inventory
+          <img className="side-icon" src={ICONS.inventory} alt="" />
+          <span>Inventory</span>
         </NavLink>
 
         <NavLink to="/admin/transactions" className={navClass}>
-          <span className="icon">🔄</span> Transactions
+          <img className="side-icon" src={ICONS.transactions} alt="" />
+          <span>Transactions</span>
         </NavLink>
 
         <NavLink to="/admin/users" className={navClass}>
-          <span className="icon">👥</span> Users
+          <img className="side-icon" src={ICONS.users} alt="" />
+          <span>Users</span>
         </NavLink>
 
         <NavLink to="/admin/logs" className={navClass}>
-          <span className="icon">🛡️</span> Audit Logs
+          <img className="side-icon" src={ICONS.logs} alt="" />
+          <span>Audit Logs</span>
         </NavLink>
       </nav>
     </aside>
