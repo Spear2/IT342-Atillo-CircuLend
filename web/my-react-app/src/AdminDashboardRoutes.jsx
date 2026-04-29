@@ -4,6 +4,7 @@ import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
 import InventoryManagementPage from "./pages/Admin/Inventory/InventoryManagementPage";
 import AdminTransactionsPage from "./pages/Admin/Transactions/AdminTransactionsPage";
 import AdminUsersPage from "./pages/Admin/Users/AdminUsersPage";
+import AdminItemDetailPage from "./pages/Admin/Inventory/AdminItemDetailPage";
 import AdminAuditLogsPage from "./pages/Admin/AuditLogs/AdminAuditLogsPage";
 
 export default function AdminDashboardRoutes() {
@@ -15,6 +16,7 @@ export default function AdminDashboardRoutes() {
       <Route path="/users" element={<AdminUsersPage />} />
       <Route path="/logs" element={<AdminAuditLogsPage />} />
       <Route path="*" element={<Navigate to="/admin" replace />} />
+      <Route path="/items/:id" element={<AdminItemDetailPage />} />
     </Routes>
   );
 }

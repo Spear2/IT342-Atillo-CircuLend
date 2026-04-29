@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import * as auth from "../../../security/auth";
 import logo from "../../../assets/logo.png"
 import admin from "../../../assets/admin.png"
@@ -17,6 +17,9 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
+
+  const location = useLocation();
+  const isItemPage = location.pathname.startsWith("/admin/items") || location.pathname.startsWith("/admin/inventory");
 
   const handleLogout = () => {
     auth.logout();
@@ -59,7 +62,7 @@ const Navbar = () => {
           <NavLink to="/admin" end className={({ isActive }) => (isActive ? "active" : "")}>
             Dashboard
           </NavLink>
-          <NavLink to="/admin/*" className={({ isActive }) => (isActive ? "active" : "")}>
+          <NavLink to="/admin/inventory" className={isItemPage ? "active" : ""}>
             Item Page
           </NavLink>
         </div>

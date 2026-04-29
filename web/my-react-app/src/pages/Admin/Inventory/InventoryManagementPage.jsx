@@ -1,17 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminNavbar from "../../../Components/Admin/Navbar/Navbar";
 import AdminSidebar from "../../../Components/Admin/Sidebar/Sidebar";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 import "../Dashboard/adminDashboard.css";
 import "./inventoryManagementPage.css";
 
-const initialForm = {
-  name: "",
-  description: "",
-  assetTag: "",
-  categoryId: "",
-  imageFile: null,
+const ICONS = {
+  header: "/placeholders/icon-inventory-header.png",
+  edit: "/placeholders/icon-edit.png",
+  delete: "/placeholders/icon-delete.png",
+  add: "/placeholders/icon-add.png",
 };
 
 async function requestJson(path, options = {}) {
@@ -25,8 +24,7 @@ async function requestJson(path, options = {}) {
   }
 
   if (!res.ok || body?.success === false) {
-    const message =
-      body?.error?.message || body?.message || `Request failed (${res.status})`;
+    const message = body?.error?.message || body?.message || `Request failed (${res.status})`;
     const err = new Error(message);
     err.code = body?.error?.code;
     err.status = res.status;
@@ -37,29 +35,19 @@ async function requestJson(path, options = {}) {
 }
 
 export default function InventoryManagementPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [items, setItems] = useState([]);
-  const [categories, setCategories] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
   const [actionError, setActionError] = useState("");
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [mode, setMode] = useState("create"); // create | edit
-  const [selectedItem, setSelectedItem] = useState(null);
-
-  const [form, setForm] = useState(initialForm);
-  const [submitting, setSubmitting] = useState(false);
-
-  const hasCategories = useMemo(() => categories.length > 0, [categories]);
-
   const loadItems = async () => {
     setLoading(true);
     setError("");
+
     try {
       const body = await requestJson("/api/items?page=0&size=50", { method: "GET" });
       setItems(body?.data?.content || []);
@@ -71,121 +59,9 @@ export default function InventoryManagementPage() {
     }
   };
 
-  const loadCategories = async () => {
-    // Optional endpoint; if not available, we fallback to categoryId text input
-    try {
-      const body = await requestJson("/api/categories", { method: "GET" });
-      setCategories(body?.data || []);
-    } catch {
-      setCategories([]);
-    }
-  };
-
   useEffect(() => {
     loadItems();
-    loadCategories();
   }, []);
-
-  useEffect(() => {
-    if (searchParams.get("new") === "1") {
-      openCreateModal();
-      searchParams.delete("new");
-      setSearchParams(searchParams, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
-
-  const openCreateModal = () => {
-    setMode("create");
-    setSelectedItem(null);
-    setForm(initialForm);
-    setActionError("");
-    setModalOpen(true);
-  };
-
-  const openEditModal = (item) => {
-    setMode("edit");
-    setSelectedItem(item);
-    setForm({
-      name: item.name || "",
-      description: item.description || "",
-      assetTag: item.assetTag || "",
-      categoryId: item.categoryId ? String(item.categoryId) : "",
-      imageFile: null,
-    });
-    setActionError("");
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    if (submitting) return;
-    setModalOpen(false);
-    setSelectedItem(null);
-    setForm(initialForm);
-    setActionError("");
-  };
-
-  const onFormChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "imageFile") {
-      setForm((prev) => ({ ...prev, imageFile: files?.[0] || null }));
-      return;
-    }
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const buildFormData = () => {
-    const fd = new FormData();
-
-    fd.append("name", form.name.trim());
-    fd.append("description", form.description);
-    fd.append("assetTag", form.assetTag.trim());
-    fd.append("categoryId", String(form.categoryId).trim());
-
-    if (form.imageFile) {
-      fd.append("imageFile", form.imageFile);
-    }
-    return fd;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setActionError("");
-    setSuccessMessage("");
-
-    try {
-      if (!form.name.trim() || !form.assetTag.trim() || !String(form.categoryId).trim()) {
-        throw new Error("Name, asset tag, and category are required.");
-      }
-
-      if (mode === "create" && !form.imageFile) {
-        throw new Error("Image is required when creating an item.");
-      }
-
-      const fd = buildFormData();
-
-      if (mode === "create") {
-        await requestJson("/api/admin/items", {
-          method: "POST",
-          body: fd,
-        });
-        setSuccessMessage("Item created successfully.");
-      } else {
-        await requestJson(`/api/admin/items/${selectedItem.itemId}`, {
-          method: "PUT",
-          body: fd,
-        });
-        setSuccessMessage("Item updated successfully.");
-      }
-
-      closeModal();
-      await loadItems();
-    } catch (err) {
-      setActionError(err.message || "Action failed.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleDelete = async (item) => {
     const ok = window.confirm(`Delete "${item.name}"?`);
@@ -215,8 +91,15 @@ export default function InventoryManagementPage() {
         <div className="admin-container">
           <header className="admin-header">
             <h1>Inventory Management</h1>
-            <button className="btn-add-item" onClick={openCreateModal}>
-              + Add New Item
+
+            {/* If you have create route, keep this. Otherwise remove temporarily. */}
+            <button
+              className="btn-add-item"
+              type="button"
+              onClick={() => navigate("/admin/items/new")}
+            >
+              <img className="btn-icon-img" src={ICONS.add} alt="" />
+              <span>Add New Item</span>
             </button>
           </header>
 
@@ -225,7 +108,8 @@ export default function InventoryManagementPage() {
 
           <section className="admin-card">
             <div className="card-header">
-              <span className="icon">📦</span> All Inventory Items
+              <img className="card-header-icon-img" src={ICONS.header} alt="" />
+              <span>All Inventory Items</span>
             </div>
 
             <div className="table-responsive-wrapper">
@@ -280,14 +164,22 @@ export default function InventoryManagementPage() {
                           </span>
                         </td>
                         <td className="actions">
-                          <button className="icon-btn" onClick={() => openEditModal(item)}>
-                            ✏️
+                          <button
+                            className="icon-btn"
+                            type="button"
+                            aria-label={`Edit ${item.name}`}
+                            onClick={() => navigate(`/admin/items/${item.itemId}`)}
+                          >
+                            <img className="table-action-icon-img" src={ICONS.edit} alt="" />
                           </button>
+
                           <button
                             className="icon-btn delete"
+                            type="button"
+                            aria-label={`Delete ${item.name}`}
                             onClick={() => handleDelete(item)}
                           >
-                            🗑️
+                            <img className="table-action-icon-img" src={ICONS.delete} alt="" />
                           </button>
                         </td>
                       </tr>
@@ -298,103 +190,6 @@ export default function InventoryManagementPage() {
           </section>
         </div>
       </div>
-
-      {modalOpen && (
-        <div className="inv-modal-backdrop">
-          <div className="inv-modal">
-            <h2>{mode === "create" ? "Add Item" : "Edit Item"}</h2>
-
-            <form onSubmit={handleSubmit} className="inv-form">
-              <label>
-                Name
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={onFormChange}
-                  required
-                />
-              </label>
-
-              <label>
-                Description
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={onFormChange}
-                  rows={3}
-                />
-              </label>
-
-              <label>
-                Asset Tag
-                <input
-                  name="assetTag"
-                  value={form.assetTag}
-                  onChange={onFormChange}
-                  required
-                />
-              </label>
-
-              {hasCategories ? (
-                <label>
-                  Category
-                  <select
-                    name="categoryId"
-                    value={form.categoryId}
-                    onChange={onFormChange}
-                    required
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((cat) => (
-                      <option key={cat.categoryId} value={cat.categoryId}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ) : (
-                <label>
-                  Category ID
-                  <input
-                    name="categoryId"
-                    type="number"
-                    value={form.categoryId}
-                    onChange={onFormChange}
-                    placeholder="Enter category id"
-                    required
-                  />
-                </label>
-              )}
-
-              <label>
-                Image {mode === "create" ? "" : "(optional for update)"}
-                <input
-                  name="imageFile"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={onFormChange}
-                  required={mode === "create"}
-                />
-              </label>
-
-              {actionError && <div className="alert-error">{actionError}</div>}
-
-              <div className="inv-modal-actions">
-                <button type="button" onClick={closeModal} disabled={submitting}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-add-item" disabled={submitting}>
-                  {submitting
-                    ? "Saving..."
-                    : mode === "create"
-                    ? "Create Item"
-                    : "Update Item"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
