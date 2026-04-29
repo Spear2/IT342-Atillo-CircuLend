@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./ItemCard.css";
-import Camera from "../../../assets/camera.jpg"
+
 
 export default function ItemCard({ item }) {
   const navigate = useNavigate();
@@ -28,9 +28,8 @@ export default function ItemCard({ item }) {
     <div className="item-card">
       <div className="item-image">
         <img
-          // src={imageFileUrl || Camera}
-          src={Camera}
-          alt={name || "Item"}
+          src={imageFileUrl}
+        
         />
       </div>
 
