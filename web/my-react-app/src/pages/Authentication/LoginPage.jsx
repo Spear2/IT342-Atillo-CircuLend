@@ -42,6 +42,8 @@ const LoginPage = () => {
 
     if (oauth2 === "missing_token") {
       setError("Google login failed: token was not returned.");
+    } else if (oauth2 === "email_exists_local") {
+      setError("This email is already registered with password login. Please sign in using email and password.");
     } else if (oauth2) {
       setError(`Google login failed: ${decodeURIComponent(oauth2)}`);
     } else if (genericError) {
@@ -81,8 +83,22 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
+
+      if (!response.ok || data?.success === false) {
+        const code = data?.error?.code;
+        const message =
+          data?.error?.message || data?.message || "Login failed. Please try again.";
+        const err = new Error(message);
+        err.code = code;
+        throw err;
+      }
+
       const token = data?.data?.accessToken;
-      const role = data?.data?.user?.role || "BORROWER";
+      const role = data?.data?.user?.role;
+
+      if (!token || !role) {
+        throw new Error("Login response is incomplete. Please try again.");
+      }
 
       setToken(token);
       setRole(role);
@@ -90,6 +106,8 @@ const LoginPage = () => {
     } catch (err) {
       if (err.code === "AUTH-004") {
         setError("Email not verified. Please check your email.");
+      } else if (err.code === "AUTH-007") {
+        setError("This account is registered with Google. Please sign in with Google.");
       } else {
         setError(err.message || "Login failed. Please try again.");
       }
