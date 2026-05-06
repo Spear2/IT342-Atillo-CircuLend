@@ -50,14 +50,29 @@ public class AuthService {
     public LoginDataDTO login(LoginRequestDTO dto) {
         User user = userRepo.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new AuthException("AUTH-001", "Invalid credentials", HttpStatus.UNAUTHORIZED));
-        if (user.getAuthProvider() == AuthProvider.LOCAL) {
-            if (user.getPassword() == null || !passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-                throw new AuthException("AUTH-001", "Invalid credentials", HttpStatus.UNAUTHORIZED);
-            }
-            if (!user.isEmailVerified()) {
-                throw new AuthException("AUTH-004", "Email not verified", HttpStatus.FORBIDDEN);
-            }
+
+        // Prevent password login for Google accounts
+        if (user.getAuthProvider() != AuthProvider.LOCAL) {
+            throw new AuthException(
+                    "AUTH-007",
+                    "This account uses Google sign-in. Please continue with Google.",
+                    HttpStatus.UNAUTHORIZED
+            );
         }
+
+        String rawPassword = dto.getPassword();
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new AuthException("AUTH-001", "Invalid credentials", HttpStatus.UNAUTHORIZED);
+        }
+
+        if (user.getPassword() == null || !passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new AuthException("AUTH-001", "Invalid credentials", HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!user.isEmailVerified()) {
+            throw new AuthException("AUTH-004", "Email not verified", HttpStatus.FORBIDDEN);
+        }
+
         String token = tokenProvider.createToken(user.getUserId(), user.getRole().name());
         return new LoginDataDTO(UserResponseDTO.fromUser(user), token, null);
     }

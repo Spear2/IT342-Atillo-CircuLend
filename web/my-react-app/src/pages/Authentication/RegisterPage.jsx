@@ -98,19 +98,36 @@ const RegisterPage = () => {
     }
 
     try {
-      await getApiClient().request("/api/auth/register", {
+      const response = await getApiClient().request("/api/auth/register", {
         method: "POST",
         auth: false,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+        }),
       });
+
+      const data = await response.json();
+
+      if (!response.ok || data?.success === false) {
+        const err = new Error(
+          data?.error?.message || data?.message || "Registration failed. Please try again."
+        );
+        err.code = data?.error?.code;
+        throw err;
+      }
 
       alert("Registration successful! Check your email to verify your account.");
       navigate("/login");
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      if (err.code === "AUTH-005") {
+        setError("Email already exists. Please log in instead.");
+      } else {
+        setError(err.message || "Registration failed. Please try again.");
+      }
     }
   };
 

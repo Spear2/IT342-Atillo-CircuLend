@@ -37,25 +37,41 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String firstName = cleanName((String) oAuth2User.getAttributes().getOrDefault("given_name", "Google"));
         String lastName = cleanName((String) oAuth2User.getAttributes().getOrDefault("family_name", "User"));
 
-        System.out.println("given_name: " + oAuth2User.getAttributes().get("given_name"));
-        System.out.println("family_name: " + oAuth2User.getAttributes().get("family_name"));
+        User user = userRepo.findByGoogleSub(sub).orElse(null);
 
-        User user = userRepo.findByGoogleSub(sub)
-                .or(() -> userRepo.findByEmail(email))
-                .orElseGet(User::new);
+        if (user == null) {
+            User byEmail = userRepo.findByEmail(email).orElse(null);
 
-        if (user.getUserId() == null) {
-            user.setEmail(email);
-            user.setFirstName(lastName);
-            user.setLastName(firstName);
-            user.setRole(Role.BORROWER);
+            if (byEmail != null) {
+                // Existing LOCAL account with same email -> block Google takeover
+                if (byEmail.getAuthProvider() == AuthProvider.LOCAL) {
+                    String redirect = UriComponentsBuilder.fromUriString(successUrl)
+                            .queryParam("oauth2", "email_exists_local")
+                            .build(true)
+                            .toUriString();
+
+                    getRedirectStrategy().sendRedirect(request, response, redirect);
+                    return;
+                }
+
+                // Existing GOOGLE account found by email
+                user = byEmail;
+            } else {
+                // First-time Google account
+                user = new User();
+                user.setEmail(email);
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
+                user.setRole(Role.BORROWER);
+                user.setPassword(null);
+            }
         }
 
+        // Always keep provider + google sub in sync for OAuth users
         user.setAuthProvider(AuthProvider.GOOGLE);
         user.setGoogleSub(sub);
         user.setEmailVerified(true);
         user.setVerifiedAt(LocalDateTime.now());
-        user.setPassword(null);
 
         User saved = userRepo.save(user);
 
