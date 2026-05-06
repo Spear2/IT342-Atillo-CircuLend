@@ -84,8 +84,8 @@
 }
 
 .detail-status.available {
-  background: #dcfce7;
-  color: #166534;
+  background-color: #21a54d;
+  color: white;
 }
 .detail-status.borrowed {
   background: #fee2e2;

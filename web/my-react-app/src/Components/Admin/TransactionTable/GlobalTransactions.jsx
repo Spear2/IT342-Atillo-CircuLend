@@ -49,7 +49,7 @@ const GlobalTransactions = () => {
     <section className="admin-card">
       <div className="card-header">
         <img className="card-header-icon-img" src={transaction} alt="" />
-        <span>Inventory Management</span>
+        <span>Global Transactions</span>
       </div>
 
       <div className="table-responsive-wrapper">

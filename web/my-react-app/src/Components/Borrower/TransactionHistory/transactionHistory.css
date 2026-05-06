@@ -46,7 +46,7 @@
   font-size: 0.8rem;
 }
 
-.status-badge {
+.status-badges {
   color: white;
   padding: 5px 14px;
   border-radius: 6px;
@@ -55,12 +55,12 @@
   display: inline-block;
 }
 
-.status-badge.completed {
+.status-badges.completed {
   background-color: #22b8ad;
 }
 
-.status-badge.active {
-  background-color: #f59e0b;
+.status-badges.active {
+  background-color: #f59b00;
 }
 
 .empty-cell {

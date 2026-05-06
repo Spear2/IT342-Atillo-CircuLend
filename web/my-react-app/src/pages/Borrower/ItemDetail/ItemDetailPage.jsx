@@ -7,13 +7,27 @@ import Camera from "../../../assets/camera.jpg"
 import "./ItemDetailPage.css";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 
+import electronics from "../../../assets/electronics.png"
+import exercise from "../../../assets/exercise.png"
+import sports from "../../../assets/sports.png"
+import technology from "../../../assets/technology.png"
+import instruments from "../../../assets/instruments.png"
+
 
 function statusLabel(status) {
   const s = String(status || "").toUpperCase();
-  if (s === "AVAILABLE") return "Available";
-  if (s === "BORROWED") return "Borrowed";
+  if (s === "AVAILABLE") return "AVAILABLE";
+  if (s === "BORROWED") return "BORROWED";
   return "Maintenance";
 }
+
+const CATEGORY_ICONS = {
+  electronics,
+  exercise,
+  sports,
+  technology,
+  instruments,
+};
 
 export default function ItemDetailPage() {
   const { id } = useParams();
@@ -134,6 +148,23 @@ export default function ItemDetailPage() {
     }
   };
 
+
+  function normalizeCategoryKey(categoryName) {
+      // handles "Electronics", "electornics", "electronic items", etc.
+      const raw = String(categoryName || "").toLowerCase().trim();
+      if (raw.includes("electornic")) return "electronics"; // typo-safe
+      if (raw.includes("electronic")) return "electronics";
+      if (raw.includes("exercise") || raw.includes("fitness") || raw.includes("gym")) return "exercise";
+      if (raw.includes("sport")) return "sports";
+      if (raw.includes("instrument")) return "instruments";
+      if (raw.includes("tech") || raw.includes("gadget")) return "technology";
+      return "technology"; // fallback
+    }
+    function getCategoryIcon(categoryName) {
+      const key = normalizeCategoryKey(categoryName);
+      return CATEGORY_ICONS[key] || technology;
+    }
+
   if (loading) {
     return (
       <div className="detail-page">
@@ -176,8 +207,7 @@ export default function ItemDetailPage() {
         <section className="detail-top">
           <div className="detail-image-wrap">
             <img
-              // src={item.imageFileUrl || {camera}}
-              src={Camera}
+              src={item.imageFileUrl}
               alt={item.name}
               className="detail-image"
             />
@@ -185,10 +215,18 @@ export default function ItemDetailPage() {
 
           <aside className="detail-panel">
             <h2>{item.name}</h2>
-            <p className="detail-category">⚯ {item.categoryName || "Uncategorized"}</p>
+            
+            <p className="detail-category"> 
+              <img
+                src={getCategoryIcon(item.categoryName)}
+                alt={item.categoryName || "Category"}
+                className="inline-icon"
+              />
+              <span>{item.categoryName || "Uncategorized"}</span>
+              </p>
 
-            <div className={`detail-status ${normalizedStatus}`}>
-              ✓ {statusLabel(item.status)}
+            <div className={`details-status ${normalizedStatus}`}>
+              ● {statusLabel(item.status)}
             </div>
 
             <hr />

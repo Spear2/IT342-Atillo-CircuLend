@@ -15,9 +15,9 @@ export default function ActiveBorrowedItems({ items = [], onReturn, returningTxI
         ) : (
           items.map((item) => (
             <div key={item.transactionId} className="item-row">
-              <div className="item-info">
+              <div className="item-infos">
                 <img
-                  src={Camera}
+                  src={item.imageFileUrl}
                   alt={item.itemName}
                   className="item-thumb"
                 />

@@ -38,6 +38,7 @@ export default function ItemCard({ item }) {
           <h3>{name || "Unnamed Item"}</h3>
           <p className="item-category">{categoryName || "Uncategorized"}</p>
         </div>
+        <div className="item-meta-divider" />
 
         <div className={`status-badge ${badgeClass}`}>● {badgeLabel}</div>
 

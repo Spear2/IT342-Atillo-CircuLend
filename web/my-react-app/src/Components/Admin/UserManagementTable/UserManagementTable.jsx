@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getApiClient } from "../../../api/ApiClientSingleton";
+import usersIcon from "../../../assets/user.png"
 
 const UserManagementTable = () => {
   const [users, setUsers] = useState([]);
@@ -41,7 +42,7 @@ const UserManagementTable = () => {
   return (
     <section className="admin-card">
       <div className="card-header">
-        <span className="icon">👥</span> User Management
+        <img className="card-header-icon-img" src={usersIcon} alt="" /> User Management
       </div>
 
       <table className="admin-table">

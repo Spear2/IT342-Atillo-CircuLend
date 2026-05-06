@@ -24,10 +24,11 @@
 }
 
 /* ── Left: Image + Text ──────────────────────────────────── */
-.item-info {
+.item-infos {
   display: flex;
   gap: 18px;
   align-items: center;
+  
   min-width: 0;
 }
 

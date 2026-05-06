@@ -5,16 +5,23 @@ import AdminSidebar from "../../../Components/Admin/Sidebar/Sidebar";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 import "../Dashboard/adminDashboard.css";
 import "./inventoryManagementPage.css";
+import AddItemModal from "../../../Components/Admin/ReusableAddItemModal/AddItemModal"
+
+import edit from "../../../assets/edit.png"
+import deleteImg from "../../../assets/delete.png"
+import inventory from "../../../assets/black-inventory.png"
+
 
 const ICONS = {
-  header: "/placeholders/icon-inventory-header.png",
-  edit: "/placeholders/icon-edit.png",
-  delete: "/placeholders/icon-delete.png",
+  header: inventory,
+  edit: edit,
+  delete: deleteImg,
   add: "/placeholders/icon-add.png",
 };
 
 async function requestJson(path, options = {}) {
   const res = await getApiClient().request(path, options);
+    
 
   let body = null;
   try {
@@ -40,6 +47,7 @@ export default function InventoryManagementPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState("");
   const [actionError, setActionError] = useState("");
@@ -96,10 +104,10 @@ export default function InventoryManagementPage() {
             <button
               className="btn-add-item"
               type="button"
-              onClick={() => navigate("/admin/items/new")}
+              onClick={() => setIsAddModalOpen(true)}
             >
               <img className="btn-icon-img" src={ICONS.add} alt="" />
-              <span>Add New Item</span>
+              <span>+ Add New Item</span>
             </button>
           </header>
 
@@ -159,7 +167,7 @@ export default function InventoryManagementPage() {
                         <td>{item.categoryName || "—"}</td>
                         <td>{item.assetTag || "—"}</td>
                         <td>
-                          <span className={`badge ${(item.status || "").toLowerCase()}`}>
+                          <span className={`badge-${(item.status || "").toLowerCase()}`}>
                             {item.status || "—"}
                           </span>
                         </td>
@@ -190,6 +198,17 @@ export default function InventoryManagementPage() {
           </section>
         </div>
       </div>
+
+      <AddItemModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onCreated={async () => {
+          setIsAddModalOpen(false);
+          setActionError("");
+          setSuccessMessage("Item added successfully.");
+          await loadItems();
+        }}
+      />
     </div>
   );
 }

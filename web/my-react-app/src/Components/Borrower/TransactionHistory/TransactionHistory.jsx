@@ -40,7 +40,7 @@ export default function TransactionHistory({
                 <td>
                   <div className="td-item">
                     <img
-                      src={Camera}
+                      src={tx.imageFileUrl}
                       alt={tx.itemName}
                     />
                     <div>
@@ -53,7 +53,7 @@ export default function TransactionHistory({
                 <td>{tx.returnedLabel}</td>
                 <td>
                   <span
-                    className={`status-badge ${
+                    className={`status-badges ${
                       String(tx.status).toUpperCase() === "COMPLETED" ? "completed" : "active"
                     }`}
                   >
