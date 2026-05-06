@@ -15,8 +15,8 @@ export default function SimilarItemCard({ item }) {
   return (
     <div className="similar-card">
       <img
-        src={item.imageFileUrl || "https://via.placeholder.com/260x150?text=No+Image"}
-        alt={item.name || "Item"}
+        src={item.imageFileUrl}
+        alt={item.name}
       />
 
       <div className="similar-content">

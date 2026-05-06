@@ -67,11 +67,14 @@
 }
 
 .detail-category {
-  color: #7a8695;
-  margin: 0.35rem 0 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  margin: 0 0 12px;
 }
 
-.detail-status {
+.details-status {
   display: inline-block;
   border-radius: 20px;
   padding: 0.28rem 0.9rem;
@@ -79,18 +82,23 @@
   font-weight: 700;
   margin-bottom: 0.8rem;
 }
-
-.detail-status.available {
-  background: #e9fdf2;
-  color: #0f9f52;
+.inline-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
 }
 
-.detail-status.borrowed {
-  background: #fff1f2;
-  color: #dc2626;
+.details-status.available {
+  background: #21a54d;
+  color: white;
 }
 
-.detail-status.maintenance {
+.details-status.borrowed {
+  background: #de3b40;
+  color: white;
+}
+
+.details-status.maintenance {
   background: #fffbeb;
   color: #b45309;
 }

@@ -45,6 +45,13 @@
   margin-top: 4px;
 }
 
+.item-meta-divider {
+  height: 1px;
+  width: 100%;
+  background: #d9e2ea;
+  margin: 0px 0 10px;
+}
+
 .status-badge {
   align-self: flex-start;
   padding: 4px 12px;
@@ -56,13 +63,13 @@
 }
 
 .status-badge.available {
-  background-color: #ecfdf5;
-  color: #059669;
+  background-color: #21a54d;
+  color: white;
 }
 
 .status-badge.borrowed {
-  background-color: #fef2f2;
-  color: #dc2626;
+  background-color: #de3b40;
+  color: white;
 }
 
 .status-badge.maintenance {

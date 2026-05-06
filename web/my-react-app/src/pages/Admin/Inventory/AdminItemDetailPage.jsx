@@ -4,10 +4,18 @@ import AdminNavbar from "../../../Components/Admin/Navbar/Navbar";
 import Footer from "../../../Components/Shared/Footer/Footer";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 import "./adminItemDetailPage.css";
+import electronics from "../../../assets/electronics.png"
+import exercise from "../../../assets/exercise.png"
+import sports from "../../../assets/sports.png"
+import technology from "../../../assets/technology.png"
+import instruments from "../../../assets/instruments.png"
 
-const ICONS = {
-  category: "/placeholders/icon-category.png",
-  status: "/placeholders/icon-status.png",
+const CATEGORY_ICONS = {
+  electronics,
+  exercise,
+  sports,
+  technology,
+  instruments,
 };
 
 const initialForm = {
@@ -44,6 +52,7 @@ function formatDate(v) {
   const d = new Date(v);
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
 }
+
 
 export default function AdminItemDetailPage() {
   const { id } = useParams();
@@ -191,6 +200,21 @@ export default function AdminItemDetailPage() {
       setActionError(err.message || "Failed to delete item.");
     }
   };
+  function normalizeCategoryKey(categoryName) {
+    // handles "Electronics", "electornics", "electronic items", etc.
+    const raw = String(categoryName || "").toLowerCase().trim();
+    if (raw.includes("electornic")) return "electronics"; // typo-safe
+    if (raw.includes("electronic")) return "electronics";
+    if (raw.includes("exercise") || raw.includes("fitness") || raw.includes("gym")) return "exercise";
+    if (raw.includes("sport")) return "sports";
+    if (raw.includes("instrument")) return "instruments";
+    if (raw.includes("tech") || raw.includes("gadget")) return "technology";
+    return "technology"; // fallback
+  }
+  function getCategoryIcon(categoryName) {
+    const key = normalizeCategoryKey(categoryName);
+    return CATEGORY_ICONS[key] || technology;
+  }
 
   if (loading) return <div className="admin-item-page"><AdminNavbar /><main className="admin-item-main"><div className="alert">Loading item details...</div></main><Footer /></div>;
   if (error || !item) return <div className="admin-item-page"><AdminNavbar /><main className="admin-item-main"><div className="alert error">{error || "Item not found."}</div></main><Footer /></div>;
@@ -215,13 +239,17 @@ export default function AdminItemDetailPage() {
             <h2>{item.name}</h2>
 
             <p className="admin-item-category">
-              <img src={ICONS.category} alt="" className="inline-icon" />
+              <img
+                src={getCategoryIcon(item.categoryName)}
+                alt={item.categoryName || "Category"}
+                className="inline-icon"
+              />
               <span>{item.categoryName || "Uncategorized"}</span>
             </p>
 
             <div className={`detail-status ${String(item.status || "").toLowerCase()}`}>
-              <img src={ICONS.status} alt="" className="inline-icon" />
-              <span>{item.status || "—"}</span>
+              
+              <span>● {item.status || "—"}</span>
             </div>
 
             <hr />

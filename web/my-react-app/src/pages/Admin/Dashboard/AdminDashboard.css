@@ -115,9 +115,22 @@
 }
 
 
-.badge.available { background: #c6f6d5; color: #22543d; }
-.badge.completed { background: #c6f6d5; color: #22543d; }
-.badge.active { background: #fed7d7; color: #822727; }
+.badge.available {
+  background-color: #21a54d;
+  color: white;
+}
+.badge.completed {
+  background-color: #21a54d;
+  color: white;
+}
+.badge.active {
+  background-color: #f59b00;
+  color: white;
+}
+.badge.borrowed {
+  background-color: #de3b40;
+  color: white;
+}
 
 .card-header {
   display: flex;
@@ -137,4 +150,8 @@
   height: 14px;
   object-fit: contain;
   display: block;
+}
+
+.cancel-btn{
+  color: white;
 }
