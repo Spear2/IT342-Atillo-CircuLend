@@ -3,6 +3,7 @@ import AdminNavbar from "../../../Components/Admin/Navbar/Navbar";
 import AdminSidebar from "../../../Components/Admin/Sidebar/Sidebar";
 import { getApiClient } from "../../../api/ApiClientSingleton";
 import "../Dashboard/adminDashboard.css";
+import { useNavigate } from "react-router-dom"
 import "../Transactions/adminListPages.css";
 
 const formatDate = (value) => {
@@ -15,6 +16,7 @@ export default function AdminUsersPage() {
   const [rows, setRows] = useState([]);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(20);
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -86,6 +88,7 @@ export default function AdminUsersPage() {
                     <th>Email</th>
                     <th>Role</th>
                     <th>Created At</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -99,6 +102,16 @@ export default function AdminUsersPage() {
                       <td>{u.email || "—"}</td>
                       <td>{u.role || "—"}</td>
                       <td>{formatDate(u.createdAt)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn-small"
+                          style={{ backgroundColor: "#5a67d8", color: "white" }}
+                          onClick={() => navigate(`/admin/users/${u.userId}`)}
+                        >
+                          View
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
