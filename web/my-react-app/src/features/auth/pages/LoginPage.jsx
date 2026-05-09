@@ -95,6 +95,7 @@ const LoginPage = () => {
 
       setToken(token);
       setRole(role);
+      alert("Successful login");
       navigate(role.toUpperCase() === "ADMIN" ? "/admin" : "/borrower", { replace: true });
     } catch (err) {
       if (err.code === "AUTH-004") {

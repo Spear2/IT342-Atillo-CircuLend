@@ -131,6 +131,7 @@ export default function ItemDetailPage() {
       });
 
       setBorrowMessage("Borrow successful!");
+      alert("Successful Borrow");
       setShowBorrowModal(false);
 
       // Refresh item status

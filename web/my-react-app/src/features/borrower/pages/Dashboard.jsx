@@ -156,6 +156,7 @@ export default function BorrowerDashboard() {
       });
 
       setReturnSuccess("Item returned successfully.");
+      alert("Return Successfuly!");
       closeReturnModal();
       await loadTransactions();
     } catch (err) {
