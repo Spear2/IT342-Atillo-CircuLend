@@ -1,8 +1,8 @@
 import React from 'react';
 import { Routes, Route} from "react-router-dom";
-import BorrowerDashboard from "./pages/Borrower/Dashboard/Dashboard"
-import ExploreItemsPage from "./pages/Borrower/ExploreItems/ExploreItemsPage"
-import ItemDetailPage from './pages/Borrower/ItemDetail/ItemDetailPage';
+import BorrowerDashboard from "@/features/borrower/pages/Dashboard"
+import ExploreItemsPage from "@/features/borrower/pages/ExploreItemsPage"
+import ItemDetailPage from '@/features/borrower/pages/ItemDetailPage';
 
 
 export default function BorrowerDashboardRoutes(){

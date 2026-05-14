@@ -1,6 +1,6 @@
 package edu.cit.atillo.circulend.security;
 
-import edu.cit.atillo.circulend.exception.AuthException;
+import edu.cit.atillo.circulend.features.auth.AuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

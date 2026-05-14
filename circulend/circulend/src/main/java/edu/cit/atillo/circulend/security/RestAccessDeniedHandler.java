@@ -1,7 +1,7 @@
 package edu.cit.atillo.circulend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.cit.atillo.circulend.dto.ApiResponse;
+import edu.cit.atillo.circulend.features.shared.dto.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

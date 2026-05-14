@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { getToken, getRole } from "./security/auth";
-import LandingPage from "./pages/Landing/LandingPage";
-import LoginPage from "./pages/Authentication/LoginPage";
-import RegisterPage from "./pages/Authentication/RegisterPage";
+import { getToken, getRole } from "@/shared/security/auth";
+import LandingPage from "@/features/public/pages/LandingPage";
+import LoginPage from "@/features/auth/pages/LoginPage";
+import RegisterPage from "@/features/auth/pages/RegisterPage";
 import BorrowerDashboard from "./BorrowerDashboardRoutes";
 import AdminDashboard from "./AdminDashboardRoutes"
-import VerifyEmailPage from "./pages/EmailVerification/EmailVerificationPage";
-import OAuth2SuccessPage from "./pages/Authentication/OAuth2SuccessPage";
+import VerifyEmailPage from "@/features/auth/pages/EmailVerificationPage";
+import OAuth2SuccessPage from "@/features/auth/pages/OAuth2SuccessPage";
 
 
 
