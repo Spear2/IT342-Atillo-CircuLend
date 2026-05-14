@@ -13,7 +13,7 @@ import com.atillo.circulend.data.model.request.LoginRequest
 import com.atillo.circulend.data.model.response.ApiResponse
 import com.atillo.circulend.data.model.response.LoginData
 import com.atillo.circulend.data.remote.RetrofitClient
-import com.atillo.circulend.ui.Dashboard.Dashboard
+import com.atillo.circulend.ui.dashboard.Dashboard
 import com.atillo.circulend.util.SessionManager
 import retrofit2.Call
 import retrofit2.Callback
@@ -32,6 +32,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        RetrofitClient.init(applicationContext)
 
         sessionManager = SessionManager(this)
 
