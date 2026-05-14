@@ -22,7 +22,7 @@ class Dashboard : AppCompatActivity() {
         setContentView(R.layout.activity_dashboard)
 
         sessionManager = SessionManager(this)
-        logoutButton = findViewById(R.id.logoutButton)
+
 
         // Protected endpoint test: GET /api/user/me
         userRepository.me { result ->
@@ -50,10 +50,6 @@ class Dashboard : AppCompatActivity() {
             }
         }
 
-        logoutButton.setOnClickListener {
-            sessionManager.clear()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        }
+
     }
 }
