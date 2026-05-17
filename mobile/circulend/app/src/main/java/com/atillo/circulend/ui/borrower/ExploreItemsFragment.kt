@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -45,7 +45,12 @@ class ExploreItemsFragment : Fragment(R.layout.fragment_explore_items) {
     private lateinit var btnPrev: ImageButton
     private lateinit var btnNext: ImageButton
 
-    private val adapter = ExploreItemAdapter()
+    private val adapter = ExploreItemAdapter { item ->
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.main_fragment_container, ItemDetailsFragment.newInstance(item))
+            .addToBackStack("item_details")
+            .commit()
+    }
     private val itemRepository = ItemRepository()
 
     private var selectedCategoryId: Long? = null
@@ -59,7 +64,6 @@ class ExploreItemsFragment : Fragment(R.layout.fragment_explore_items) {
 
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -80,10 +84,19 @@ class ExploreItemsFragment : Fragment(R.layout.fragment_explore_items) {
         setupStatusChips()
         setupSearch()
         setupPagination()
-
+        setupDetailsBorrowResultListener()
         swipeRefresh.setOnRefreshListener { loadItems(resetPage = false) }
 
         loadItems(resetPage = true)
+    }
+
+    private fun setupDetailsBorrowResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            ItemDetailsFragment.RESULT_KEY_BORROWED,
+            viewLifecycleOwner
+        ) { _, _ ->
+            loadItems(resetPage = false)
+        }
     }
 
     private fun setupCategoryChips() {
@@ -168,10 +181,14 @@ class ExploreItemsFragment : Fragment(R.layout.fragment_explore_items) {
 
                         val mapped = result.items.map {
                             ExploreItemUi(
+                                itemId = it.itemId,
+                                categoryId = it.categoryId,
                                 name = it.name,
                                 category = (it.categoryName ?: "Uncategorized").uppercase(),
                                 status = it.status,
-                                imageUrl = it.imageFileUrl
+                                imageUrl = it.imageFileUrl,
+                                assetTag = it.assetTag ?: "",
+                                description = it.description
                             )
                         }
                         adapter.submitList(mapped)
