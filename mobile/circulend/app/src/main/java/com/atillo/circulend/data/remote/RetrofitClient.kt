@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://172.16.81.168:8080/"
+    private const val BASE_URL = "http://10.174.106.226:8080/"
 
     private lateinit var sessionManager: SessionManager
 
@@ -57,4 +57,5 @@ object RetrofitClient {
 
     val authApi: AuthApiService by lazy { retrofit.create(AuthApiService::class.java) }
     val userApi: UserApiService by lazy { retrofit.create(UserApiService::class.java) }
+    val itemApi: ItemApiService by lazy { retrofit.create(ItemApiService::class.java) }
 }
